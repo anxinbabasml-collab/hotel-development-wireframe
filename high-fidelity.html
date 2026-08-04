@@ -978,7 +978,7 @@
     .btn.primary { border-color: var(--accent); background: linear-gradient(135deg, #b5000d, #d70110); box-shadow: 0 9px 18px rgba(215,1,16,.2); }
     .btn.danger { border-color: #f0b9c1; color: #b83c50; background: #fff7f8; }
     .btn:active { transform: translateY(1px); opacity: .88; }
-    .bottom-actions, .bottom-nav {
+    .bottom-actions {
       right: 12px;
       bottom: 12px;
       left: 12px;
@@ -987,6 +987,17 @@
       background: rgba(255,255,255,.88);
       box-shadow: 0 12px 28px rgba(112, 22, 29, .13), 0 2px 8px rgba(112, 22, 29, .06);
       backdrop-filter: blur(16px);
+    }
+    .bottom-nav {
+      right: 0;
+      bottom: 0;
+      left: 0;
+      border: 0;
+      border-top: 1px solid #f0d7da;
+      border-radius: 0;
+      background: #fff;
+      box-shadow: none;
+      backdrop-filter: none;
     }
     .bottom-actions { padding: 10px 10px calc(10px + env(safe-area-inset-bottom)); }
     .bottom-nav { min-height: 68px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); }
