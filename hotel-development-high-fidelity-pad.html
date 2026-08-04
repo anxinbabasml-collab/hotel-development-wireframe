@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>酒店拓展 H5｜Pad 预览</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; margin: 0; }
+    body {
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      color: #14213d;
+      background: radial-gradient(circle at 12% 0%, rgba(215, 1, 16, .12), transparent 28%), #fff5f5;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .preview-shell { width: min(100%, 1120px); }
+    .preview-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin: 0 auto 15px; }
+    .preview-head h1 { margin: 0; font-size: 22px; letter-spacing: -.03em; }
+    .preview-head p { margin: 5px 0 0; color: #8c7c80; font-size: 12px; }
+    .preview-badge { padding: 8px 12px; border: 1px solid #f0c5c9; border-radius: 999px; color: #8f0009; background: #fff0f1; font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .pad-frame {
+      width: 100%;
+      overflow: hidden;
+      border: 8px solid #25272b;
+      border-radius: 24px;
+      background: #fff;
+      box-shadow: 0 24px 60px rgba(100, 18, 24, .2);
+    }
+    .pad-canvas { width: 100%; aspect-ratio: 1024 / 768; overflow: hidden; background: #f6f8fb; }
+    .pad-canvas iframe { display: block; width: 1024px; height: 768px; border: 0; transform-origin: top left; }
+    .preview-foot { margin: 12px 2px 0; color: #9a888b; font-size: 11px; }
+    @media (max-width: 767px) {
+      body { padding: 14px; }
+      .preview-head { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .pad-canvas iframe { transform: scale(.68); }
+    }
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .pad-canvas iframe { transform: scale(.76); }
+    }
+    @media (min-width: 1024px) and (max-width: 1199px) {
+      .pad-canvas iframe { transform: scale(.9); }
+    }
+    @media (min-width: 1200px) {
+      .pad-canvas iframe { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <main class="preview-shell">
+    <header class="preview-head">
+      <div><h1>酒店拓展 · Pad 端预览</h1><p>按 1024 × 768 Pad 画布加载高保真原型，支持点击流程导航。</p></div>
+      <span class="preview-badge">Pad / 1024 × 768</span>
+    </header>
+    <section class="pad-frame" aria-label="Pad 高保真原型预览">
+      <div class="pad-canvas"><iframe src="hotel-development-high-fidelity.html" title="酒店拓展 Pad 端高保真原型"></iframe></div>
+    </section>
+    <p class="preview-foot">当前预览会自动缩放到浏览器窗口；原型内部仍按 Pad 断点渲染。</p>
+  </main>
+</body>
+</html>

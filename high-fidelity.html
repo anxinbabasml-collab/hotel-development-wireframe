@@ -1,0 +1,1687 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>酒店拓展 H5｜高保真原型</title>
+  <style>
+    :root {
+      --ink: #181b1f;
+      --muted: #69717c;
+      --line: #c8cdd3;
+      --soft-line: #e3e6e9;
+      --paper: #fff;
+      --canvas: #eef0f2;
+      --panel: #f7f8f9;
+      --accent: #1d63d5;
+      --accent-soft: #e9f0fc;
+      --danger: #a22a2a;
+      --success: #1c6a43;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(24, 27, 31, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24, 27, 31, .035) 1px, transparent 1px),
+        var(--canvas);
+      background-size: 24px 24px;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.5;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { touch-action: manipulation; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(29, 99, 213, .3);
+      outline-offset: 2px;
+    }
+
+    .workspace {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: 300px minmax(390px, 1fr) 300px;
+    }
+
+    .rail {
+      position: sticky;
+      top: 0;
+      height: 100dvh;
+      overflow: auto;
+      padding: 24px;
+      background: rgba(247, 248, 249, .96);
+      border-right: 1px solid var(--line);
+    }
+
+    .rail.right {
+      border-right: 0;
+      border-left: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 23px;
+      line-height: 1.25;
+    }
+
+    .intro {
+      margin: 10px 0 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .role-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      padding: 4px;
+      background: #e6e9ec;
+      border-radius: 10px;
+    }
+
+    .role-switch button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 7px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .role-switch button.active {
+      color: var(--ink);
+      background: var(--paper);
+      box-shadow: 0 1px 3px rgba(20, 25, 30, .15);
+      font-weight: 700;
+    }
+
+    .section-label {
+      margin: 24px 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .flow-list {
+      display: grid;
+      gap: 4px;
+    }
+
+    .flow-item {
+      width: 100%;
+      min-height: 44px;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 9px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--muted);
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .flow-item:hover { background: #eceff2; }
+    .flow-item.active {
+      color: var(--accent);
+      border-color: #a9c4ee;
+      background: var(--accent-soft);
+      font-weight: 700;
+    }
+
+    .flow-no {
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      font-size: 11px;
+    }
+
+    .stage {
+      min-width: 0;
+      display: grid;
+      place-items: center;
+      padding: 36px 24px;
+    }
+
+    .phone-wrap { width: min(390px, 100%); }
+    .screen-caption {
+      min-height: 28px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .screen-caption strong { color: var(--ink); }
+    .phone {
+      position: relative;
+      height: min(780px, calc(100dvh - 112px));
+      min-height: 620px;
+      overflow: hidden;
+      border: 2px solid var(--ink);
+      border-radius: 32px;
+      background: var(--paper);
+      box-shadow: 0 18px 45px rgba(20, 25, 30, .18);
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      z-index: 20;
+      top: 8px;
+      left: 50%;
+      width: 94px;
+      height: 24px;
+      border-radius: 16px;
+      background: var(--ink);
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .app-screen,
+    #screenRoot {
+      height: 100%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding-top: 39px;
+      background: var(--panel);
+    }
+
+    .topbar {
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 48px 1fr 48px;
+      align-items: center;
+      padding: 0 8px;
+      background: var(--paper);
+      border-bottom: 1px solid var(--soft-line);
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 17px;
+      text-align: center;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 8px;
+      color: var(--ink);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover { background: var(--panel); }
+    .icon-btn svg { width: 21px; height: 21px; }
+    .topbar-spacer { width: 44px; height: 44px; }
+
+    .content {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      padding: 16px 16px 96px;
+    }
+
+    .hero {
+      margin-bottom: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .hero h3 { margin: 0 0 4px; font-size: 21px; }
+    .hero p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      padding: 10px 8px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat strong { display: block; font-size: 20px; }
+    .stat span { color: var(--muted); font-size: 11px; }
+
+    .card {
+      margin-bottom: 12px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .card-title h3, .card-title h4 { margin: 0; font-size: 16px; }
+    .card-title small { color: var(--muted); }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 22px 0 10px;
+    }
+    .section-head .section-label { margin: 0; }
+    .section-head button {
+      min-height: 44px;
+      padding: 6px 4px;
+      border: 0;
+      color: var(--accent);
+      background: transparent;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      margin: 12px -16px 16px;
+      padding: 0 16px 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .chip-row::-webkit-scrollbar { display: none; }
+    .chip {
+      min-height: 40px;
+      flex: 0 0 auto;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--paper);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .chip.active {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .summary-cell {
+      min-width: 0;
+      padding: 11px 12px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    .summary-cell span {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .summary-cell strong {
+      display: block;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 10px;
+    }
+    .field-grid .wide { grid-column: 1 / -1; }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .media-placeholder {
+      min-height: 76px;
+      display: grid;
+      place-items: center;
+      padding: 8px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      background: #fafafa;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    details.detail-group {
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+    details.detail-group summary {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    details.detail-group summary::after {
+      content: "展开";
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    details.detail-group[open] summary::after { content: "收起"; }
+    .detail-body {
+      padding: 0 15px 12px;
+      border-top: 1px solid var(--soft-line);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 26px;
+      padding: 3px 8px;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .status::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .status.pending { color: #875d0c; }
+    .status.success { color: var(--success); }
+    .status.danger { color: var(--danger); }
+    .status.info { color: var(--accent); }
+
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .required { color: var(--danger); }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 12px;
+      border: 1px solid #aeb5bd;
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--paper);
+      font-size: 16px;
+    }
+    .field textarea { min-height: 82px; resize: vertical; }
+    .field .hint { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+
+    .upload {
+      min-height: 126px;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      border: 1px dashed #8b939d;
+      border-radius: 8px;
+      color: var(--muted);
+      background: #fafafa;
+      text-align: center;
+      cursor: pointer;
+    }
+    .upload svg { width: 28px; height: 28px; margin-bottom: 6px; }
+    .upload strong { display: block; color: var(--ink); font-size: 14px; }
+    .upload small { display: block; margin-top: 3px; }
+
+    .check-row, .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--soft-line);
+      font-size: 14px;
+    }
+    .check-row:last-child, .info-row:last-child { border-bottom: 0; }
+    .check-row span:first-child, .info-row span:first-child { color: var(--muted); }
+    .check-row strong, .info-row strong { text-align: right; }
+
+    .radio-card {
+      width: 100%;
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--paper);
+      text-align: left;
+      cursor: pointer;
+    }
+    .radio-card.active { border: 2px solid var(--accent); background: var(--accent-soft); }
+    .radio-dot {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      border: 2px solid var(--line);
+      border-radius: 50%;
+    }
+    .active .radio-dot { border: 6px solid var(--accent); background: white; }
+    .radio-card small { display: block; color: var(--muted); }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      margin-bottom: 16px;
+    }
+    .step {
+      position: relative;
+      padding-top: 22px;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+    .step::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      width: 9px;
+      height: 9px;
+      z-index: 2;
+      border: 2px solid var(--line);
+      border-radius: 50%;
+      background: var(--paper);
+      transform: translateX(-50%);
+    }
+    .step::after {
+      content: "";
+      position: absolute;
+      top: 11px;
+      left: -50%;
+      width: 100%;
+      height: 1px;
+      background: var(--line);
+    }
+    .step:first-child::after { display: none; }
+    .step.done, .step.active { color: var(--ink); font-weight: 700; }
+    .step.done::before, .step.active::before { border-color: var(--accent); background: var(--accent); }
+    .step.done::after, .step.active::after { background: var(--accent); }
+
+    .notice {
+      margin-bottom: 14px;
+      padding: 12px;
+      border-left: 4px solid var(--muted);
+      background: #eceff1;
+      color: #454b53;
+      font-size: 13px;
+    }
+    .notice.info { border-color: var(--accent); background: var(--accent-soft); }
+    .notice.danger { border-color: var(--danger); background: #f7eaea; color: #6f2222; }
+    .notice.success { border-color: var(--success); background: #e8f3ed; color: #174d34; }
+
+    .empty, .result {
+      min-height: 360px;
+      display: grid;
+      place-content: center;
+      padding: 26px;
+      text-align: center;
+    }
+    .result-icon {
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 18px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: var(--paper);
+      font-size: 30px;
+      font-weight: 700;
+    }
+    .result h3 { margin: 0 0 8px; font-size: 21px; }
+    .result p { margin: 0 auto 20px; color: var(--muted); font-size: 14px; }
+
+    .timeline { padding-left: 9px; }
+    .timeline-item {
+      position: relative;
+      padding: 0 0 22px 25px;
+      border-left: 1px solid var(--line);
+    }
+    .timeline-item:last-child { padding-bottom: 0; border-left-color: transparent; }
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: -6px;
+      width: 10px;
+      height: 10px;
+      border: 1px solid var(--muted);
+      border-radius: 50%;
+      background: var(--paper);
+    }
+    .timeline-item.current::before { border-color: var(--accent); background: var(--accent); }
+    .timeline-item.done::before { border-color: var(--success); background: var(--success); }
+    .timeline-item.danger::before { border-color: var(--danger); background: var(--danger); }
+    .timeline-item strong { display: block; font-size: 14px; }
+    .timeline-item small { color: var(--muted); }
+
+    .audit-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 10px;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .bottom-actions {
+      position: absolute;
+      z-index: 10;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--soft-line);
+      background: rgba(255, 255, 255, .97);
+    }
+    .bottom-actions.single { grid-template-columns: 1fr; }
+
+    .btn {
+      min-height: 48px;
+      padding: 10px 14px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--paper);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn.primary { color: white; border-color: var(--accent); background: var(--accent); }
+    .btn.danger { color: var(--danger); border-color: var(--danger); }
+    .btn:active { opacity: .75; }
+    .btn.full { width: 100%; }
+    /* Inline action arrows need an explicit size; otherwise SVG uses its browser default canvas. */
+    .btn svg, .text-action svg { width: 17px; height: 17px; display: inline-block; vertical-align: -4px; margin-left: 6px; }
+
+    .bottom-nav {
+      position: absolute;
+      z-index: 10;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      min-height: 76px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--soft-line);
+      background: rgba(255, 255, 255, .97);
+    }
+    .nav-item {
+      min-height: 52px;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 2px;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .nav-item.active { color: var(--accent); font-weight: 700; }
+    .nav-item svg { width: 21px; height: 21px; }
+
+    .annotation-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 12px;
+    }
+    .annotation-no {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: white;
+      background: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .annotation-title h2 { margin: 0; font-size: 17px; }
+    .annotation {
+      padding: 12px 0;
+      border-top: 1px solid var(--soft-line);
+    }
+    .annotation:first-of-type { border-top: 0; }
+    .annotation strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .annotation p { margin: 0; color: var(--muted); font-size: 13px; }
+    .branch {
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: white;
+      font-size: 12px;
+    }
+    .branch strong { display: block; margin-bottom: 5px; }
+
+    .mobile-header { display: none; }
+    .drawer-backdrop { display: none; }
+
+    @media (max-width: 1040px) {
+      .workspace { grid-template-columns: 270px minmax(390px, 1fr); }
+      .rail.right { display: none; }
+    }
+
+    @media (max-width: 720px) {
+      body { background: var(--paper); }
+      .workspace { display: block; }
+      .rail.left {
+        position: fixed;
+        z-index: 50;
+        top: 0;
+        left: 0;
+        width: min(320px, 88vw);
+        height: 100dvh;
+        transform: translateX(-105%);
+        transition: transform .22s ease;
+        box-shadow: 10px 0 30px rgba(0,0,0,.2);
+      }
+      .rail.left.open { transform: translateX(0); }
+      .drawer-backdrop.open {
+        position: fixed;
+        z-index: 45;
+        inset: 0;
+        display: block;
+        border: 0;
+        background: rgba(0,0,0,.45);
+      }
+      .mobile-header {
+        position: fixed;
+        z-index: 30;
+        top: 0;
+        right: 0;
+        left: 0;
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: env(safe-area-inset-top) 8px 0;
+        border-bottom: 1px solid var(--line);
+        background: white;
+      }
+      .mobile-header strong { font-size: 14px; }
+      .stage { min-height: 100dvh; padding: 52px 0 0; }
+      .phone-wrap { width: 100%; }
+      .screen-caption { display: none; }
+      .phone {
+        height: calc(100dvh - 52px);
+        min-height: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .phone::before { display: none; }
+      .app-screen, #screenRoot { padding-top: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+  <style>
+    /* High-fidelity brand layer: supplied JZZC red logo system */
+    :root {
+      --ink: #14213d;
+      --muted: #6f7f99;
+      --line: #d9e4f3;
+      --soft-line: #edf2f8;
+      --paper: #ffffff;
+      --canvas: #fff5f5;
+      --panel: #fffafb;
+      --accent: #d70110;
+      --accent-strong: #b5000d;
+      --accent-deep: #8f0009;
+      --accent-soft: #fff0f1;
+      --danger: #d9485f;
+      --success: #1c9b72;
+      --warning: #bf7d1a;
+      --radius: 16px;
+      --shadow-sm: 0 6px 18px rgba(139, 15, 25, .07);
+      --shadow-md: 0 18px 44px rgba(139, 15, 25, .15);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 15% 0%, rgba(215, 1, 16, .13), transparent 30%),
+        radial-gradient(circle at 88% 22%, rgba(245, 139, 147, .16), transparent 24%),
+        var(--canvas);
+      color: var(--ink);
+    }
+
+    .workspace { grid-template-columns: 292px minmax(430px, 1fr) 320px; }
+    .rail {
+      padding: 26px 22px;
+      background: rgba(255, 255, 255, .9);
+      border-color: var(--line);
+      box-shadow: inset -1px 0 0 rgba(255,255,255,.65);
+    }
+    .rail.right { box-shadow: inset 1px 0 0 rgba(255,255,255,.65); }
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 12px;
+      color: var(--accent-deep);
+      letter-spacing: .08em;
+    }
+    .brand-mark img {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      box-shadow: 0 5px 12px rgba(215, 1, 16, .22);
+    }
+    h1 { font-size: 25px; letter-spacing: -.02em; }
+    .intro { color: #71809a; line-height: 1.65; }
+    .role-switch { background: #fff2f3; border: 1px solid #f4d7da; border-radius: 13px; }
+    .role-switch button { border-radius: 10px; }
+    .role-switch button.active {
+      color: var(--accent-deep);
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(139, 15, 25, .12);
+    }
+    .section-label { color: #8392aa; letter-spacing: .04em; }
+    .flow-list { gap: 6px; }
+    .flow-item { border-radius: 12px; }
+    .flow-item:hover { background: #fff5f5; }
+    .flow-item.active {
+      color: var(--accent-deep);
+      border-color: #f1b9be;
+      background: linear-gradient(100deg, #fff0f1, #fffafb);
+      box-shadow: 0 5px 14px rgba(215, 1, 16, .08);
+    }
+    .flow-no { border-color: #edb7bd; background: #fff; }
+    .flow-item.active .flow-no { border-color: var(--accent); color: var(--accent); }
+
+    .stage { padding: 24px; }
+    /* Prototype metadata stays in the side rails; keep the device presentation clean. */
+    .screen-caption { display: none; }
+    .phone {
+      border: 8px solid #16294b;
+      border-radius: 38px;
+      background: var(--paper);
+      box-shadow: 0 24px 64px rgba(104, 18, 25, .22), 0 4px 12px rgba(104, 18, 25, .12);
+    }
+    .phone::before { background: #16294b; }
+    .app-screen, #screenRoot { background: var(--panel); }
+    .topbar {
+      min-height: 62px;
+      padding: 0 10px;
+      background: rgba(255,255,255,.94);
+      border-bottom-color: var(--soft-line);
+      box-shadow: 0 2px 12px rgba(139, 15, 25, .04);
+    }
+    .topbar h2 {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 17px;
+      letter-spacing: -.01em;
+    }
+    .topbar h2::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+      border-radius: 7px;
+      background: url("assets/jzzc-logo.png") center / cover no-repeat;
+      box-shadow: 0 4px 10px rgba(215, 1, 16, .2);
+    }
+    .icon-btn { border-radius: 12px; color: #536987; }
+    .icon-btn:hover { color: var(--accent); background: #fff1f2; }
+    .content {
+      padding: 18px 18px 102px;
+      background: linear-gradient(180deg, #fffafb 0%, #fff7f8 100%);
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+      border: 0;
+      border-radius: 20px;
+      color: #fff;
+      background: linear-gradient(135deg, #9f000a 0%, #d70110 55%, #ef6d76 100%);
+      box-shadow: 0 14px 30px rgba(159, 0, 10, .2);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -28px;
+      bottom: -50px;
+      width: 170px;
+      height: 170px;
+      border: 24px solid rgba(255,255,255,.13);
+      border-radius: 50%;
+    }
+    .hero h3 { position: relative; z-index: 1; font-size: 22px; }
+    .hero p { position: relative; z-index: 1; color: rgba(255,255,255,.82); }
+    .hero .stat-grid { position: relative; z-index: 1; }
+    .stat { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.13); }
+    .stat span { color: rgba(255,255,255,.78); }
+    .card, details.detail-group {
+      border-color: #e2eaf5;
+      border-radius: 17px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card { padding: 16px; }
+    .card-title h3, .card-title h4 { font-size: 15px; }
+    .summary-cell { border: 0; background: #fff5f6; border-radius: 12px; }
+    .summary-cell span { color: #7c8da8; }
+    .chip { border-color: #d8e4f4; background: #fff; }
+    .chip.active { border-color: #ee9ea6; background: #fff0f1; color: var(--accent-deep); }
+    .field label { color: #344663; font-size: 13px; }
+    .field input, .field select, .field textarea {
+      border-color: #d4e0ef;
+      border-radius: 12px;
+      background: #fbfdff;
+      box-shadow: inset 0 1px 2px rgba(139, 15, 25, .03);
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: #e2757e;
+      box-shadow: 0 0 0 4px rgba(215, 1, 16, .11);
+    }
+    .upload { border-color: #ed9ca4; border-radius: 14px; color: var(--accent); background: #fff7f7; }
+    .upload strong { color: #7c3037; }
+    .check-row, .info-row { border-bottom-color: var(--soft-line); }
+    .check-row span:first-child, .info-row span:first-child { color: #7b8da8; }
+    .radio-card { border-color: #f0d9dc; border-radius: 14px; box-shadow: 0 4px 12px rgba(139, 15, 25, .04); }
+    .radio-card.active { border-color: #e87b85; background: #fff1f2; box-shadow: 0 7px 18px rgba(215, 1, 16, .12); }
+    .step { color: #98a7bd; }
+    .step.done, .step.active { color: var(--accent-deep); }
+    .step.done::before, .step.active::before { border-color: var(--accent); background: var(--accent); }
+    .step.done::after, .step.active::after { background: #ed9aa2; }
+    .notice { border-radius: 12px; border-left-width: 3px; background: #f0f4f9; color: #566781; }
+    .notice.info { background: #fff0f1; color: #7e333a; }
+    .notice.danger { background: #fff1f3; color: #8f3345; }
+    .notice.success { background: #ecfaf5; color: #246a55; }
+    .status { border: 0; background: #f0f3f7; font-weight: 700; }
+    .status.pending { color: #9a6812; background: #fff6df; }
+    .status.success { color: #197957; background: #e9f8f1; }
+    .status.danger { color: #b83c50; background: #fff0f2; }
+    .status.info { color: #a5000b; background: #fff0f1; }
+    .result-icon { border: 0; color: #fff; background: linear-gradient(135deg, #9f000a, #eb6670); box-shadow: 0 12px 22px rgba(215,1,16,.22); }
+    .btn {
+      border: 1px solid #d4e0ef;
+      border-radius: 13px;
+      color: #355174;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(39, 75, 125, .05);
+    }
+    .btn.primary { border-color: var(--accent); background: linear-gradient(135deg, #b5000d, #d70110); box-shadow: 0 9px 18px rgba(215,1,16,.2); }
+    .btn.danger { border-color: #f0b9c1; color: #b83c50; background: #fff7f8; }
+    .btn:active { transform: translateY(1px); opacity: .88; }
+    .bottom-actions, .bottom-nav {
+      right: 12px;
+      bottom: 12px;
+      left: 12px;
+      border: 1px solid rgba(240, 215, 218, .92);
+      border-radius: 19px;
+      background: rgba(255,255,255,.88);
+      box-shadow: 0 12px 28px rgba(112, 22, 29, .13), 0 2px 8px rgba(112, 22, 29, .06);
+      backdrop-filter: blur(16px);
+    }
+    .bottom-actions { padding: 10px 10px calc(10px + env(safe-area-inset-bottom)); }
+    .bottom-nav { min-height: 68px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); }
+    .nav-item { min-height: 50px; border-radius: 14px; color: #9a888b; transition: background .2s ease, color .2s ease, transform .2s ease; }
+    .nav-item.active { color: var(--accent-deep); background: #fff0f1; }
+    .nav-item:active { transform: scale(.97); }
+    .annotation-no { background: linear-gradient(135deg, #b5000d, #d70110); box-shadow: 0 8px 16px rgba(215,1,16,.2); }
+    .annotation { border-top-color: var(--soft-line); }
+    .branch { border-color: #f0c5c9; background: #fffafa; color: #80555a; border-radius: 14px; }
+    .mobile-header { background: rgba(255,255,255,.93); border-bottom-color: var(--soft-line); backdrop-filter: blur(14px); }
+    .mobile-header strong { color: var(--ink); }
+    .mobile-brand { display: inline-flex; align-items: center; gap: 7px; }
+    .mobile-brand img { width: 22px; height: 22px; border-radius: 7px; }
+
+    /* Product-level surfaces used by the high-fidelity screens */
+    .product-home { padding-top: 16px; }
+    .product-hero {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 18px;
+      padding: 22px 18px 18px;
+      border-radius: 24px;
+      color: #fff;
+      background: linear-gradient(140deg, #870009 0%, #d70110 54%, #ed6a72 100%);
+      box-shadow: 0 18px 32px rgba(159, 0, 10, .22);
+    }
+    .product-hero::after {
+      content: "";
+      position: absolute;
+      right: -38px;
+      top: -62px;
+      width: 196px;
+      height: 196px;
+      border: 30px solid rgba(255,255,255,.13);
+      border-radius: 50%;
+    }
+    .product-hero-top { position: relative; z-index: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .product-hero h3 { margin: 4px 0 4px; font-size: 23px; letter-spacing: -.03em; }
+    .product-hero p { margin: 0; color: rgba(255,255,255,.78); font-size: 13px; }
+    .product-kicker { margin: 0; color: rgba(255,255,255,.68); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(255,255,255,.62);
+      border-radius: 50%;
+      color: #9e000a;
+      background: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      box-shadow: 0 8px 16px rgba(76,0,5,.18);
+    }
+    .kpi-strip { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 22px; }
+    .kpi { padding: 11px 8px; border: 1px solid rgba(255,255,255,.22); border-radius: 13px; background: rgba(255,255,255,.12); }
+    .kpi strong { display: block; font-size: 21px; line-height: 1.1; }
+    .kpi span { color: rgba(255,255,255,.7); font-size: 11px; }
+    .section-title-row { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin: 22px 2px 10px; }
+    .section-title-row h3 { margin: 2px 0 0; font-size: 18px; letter-spacing: -.02em; }
+    .section-kicker { margin: 0; color: #a45a60; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .text-action { min-height: 44px; padding: 6px 0; border: 0; color: var(--accent); background: transparent; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .quick-card {
+      min-height: 106px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 7px;
+      padding: 14px;
+      border: 1px solid #f1d9dc;
+      border-radius: 17px;
+      color: var(--ink);
+      background: #fff;
+      text-align: left;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+    }
+    .quick-card:hover { border-color: #e9a7ad; transform: translateY(-1px); }
+    .quick-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 11px; color: var(--accent); background: #fff0f1; }
+    .quick-icon svg { width: 19px; height: 19px; }
+    .quick-card strong { font-size: 14px; }
+    .quick-card small { color: #8c7c80; font-size: 11px; }
+    .task-stack { display: grid; gap: 10px; }
+    .task-card { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid #eee2e3; border-radius: 17px; color: var(--ink); background: #fff; text-align: left; box-shadow: var(--shadow-sm); cursor: pointer; }
+    .task-card:hover { border-color: #e9a7ad; }
+    .task-icon { width: 38px; height: 38px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 13px; color: #fff; background: #d70110; }
+    .task-icon.warm { color: #9a6812; background: #fff0d2; }
+    .task-icon.cool { color: #227957; background: #e8f7f0; }
+    .task-icon svg { width: 19px; height: 19px; }
+    .task-body { min-width: 0; flex: 1; }
+    .task-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .task-line strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+    .task-meta { display: block; margin-top: 5px; color: #8c7c80; font-size: 11px; }
+    .task-arrow { color: #b8898e; }
+    .task-arrow svg { width: 18px; height: 18px; }
+    .progress-card { padding: 16px; border: 1px solid #f0dfe1; border-radius: 17px; background: linear-gradient(120deg, #fff, #fff5f6); box-shadow: var(--shadow-sm); }
+    .progress-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .progress-card-head strong { color: var(--accent-deep); font-size: 18px; }
+    .progress-card-head span { color: #8c7c80; font-size: 12px; }
+    .progress-track { height: 7px; margin-top: 13px; overflow: hidden; border-radius: 999px; background: #f5dfe1; }
+    .progress-track span { display: block; width: 60%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #b5000d, #e65a63); }
+    .flow-hero { margin-bottom: 16px; padding: 20px; border-radius: 20px; color: #fff; background: linear-gradient(140deg, #870009, #d70110); box-shadow: 0 14px 26px rgba(159,0,10,.18); }
+    .flow-hero .product-kicker { color: rgba(255,255,255,.66); }
+    .flow-hero h3 { margin: 7px 0 5px; font-size: 21px; }
+    .flow-hero p { margin: 0; color: rgba(255,255,255,.76); font-size: 13px; }
+    .flow-progress { height: 5px; margin-top: 18px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.24); }
+    .flow-progress span { display: block; width: 33%; height: 100%; border-radius: inherit; background: #fff; }
+    .verify-card { padding: 17px; border: 1px solid #f0dfe1; border-radius: 19px; background: #fff; box-shadow: var(--shadow-sm); }
+    .verify-heading { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 18px; }
+    .verify-heading-icon { width: 34px; height: 34px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 11px; color: var(--accent); background: #fff0f1; }
+    .verify-heading-icon svg { width: 19px; height: 19px; }
+    .verify-heading h3 { margin: 0; font-size: 15px; }
+    .verify-heading p { margin: 3px 0 0; color: #8c7c80; font-size: 11px; }
+    .upload.compact { min-height: 88px; grid-template-columns: auto 1fr; grid-template-rows: 1fr; place-items: center start; gap: 10px; padding: 12px; text-align: left; }
+    .upload.compact svg { margin: 0; }
+    .verify-or { display: flex; align-items: center; gap: 10px; margin: 2px 0 14px; color: #a89497; font-size: 11px; }
+    .verify-or::before, .verify-or::after { content: ""; height: 1px; flex: 1; background: #f0e3e4; }
+    .code-field { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+    .code-field .text-action { padding-inline: 10px; border: 1px solid #f0c5c9; border-radius: 11px; background: #fff7f7; white-space: nowrap; }
+    .guide-card { display: flex; gap: 10px; margin-top: 14px; padding: 13px; border-radius: 14px; background: #fff7f7; color: #80555a; font-size: 12px; }
+    .guide-card svg { width: 17px; height: 17px; flex: 0 0 auto; color: var(--accent); }
+    .hotel-invite { padding-top: 3px; }
+    .invite-mark { width: 64px; height: 64px; display: grid; place-items: center; margin: 6px auto 15px; border-radius: 21px; background: #fff; box-shadow: 0 12px 28px rgba(139,15,25,.12); }
+    .invite-mark img { width: 54px; height: 54px; border-radius: 17px; }
+    .invite-copy { text-align: center; }
+    .invite-copy h3 { margin: 0; font-size: 23px; letter-spacing: -.03em; }
+    .invite-copy p { margin: 7px 20px 20px; color: #8c7c80; font-size: 13px; }
+    .invite-from { display: flex; align-items: center; gap: 11px; margin-bottom: 14px; padding: 13px; border: 1px solid #f0dfe1; border-radius: 15px; background: #fff; }
+    .invite-from .avatar { width: 34px; height: 34px; border: 0; color: #fff; background: #d70110; font-size: 13px; }
+    .invite-from strong { display: block; font-size: 13px; }
+    .invite-from small { color: #8c7c80; font-size: 11px; }
+    .status-hero { padding: 20px; border-radius: 21px; color: #fff; background: linear-gradient(140deg, #870009, #d70110 65%, #ed6a72); box-shadow: 0 16px 30px rgba(159,0,10,.18); }
+    .status-hero .card-title { margin-bottom: 20px; }
+    .status-hero .card-title small { color: rgba(255,255,255,.7); }
+    .status-hero .status.info { color: #a5000b; background: #fff; }
+    .status-hero .summary-grid { margin-bottom: 0; }
+    .status-hero .summary-cell { background: rgba(255,255,255,.14); }
+    .status-hero .summary-cell span { color: rgba(255,255,255,.7); }
+    .status-hero .summary-cell strong { color: #fff; }
+    .timeline-card { padding: 17px; border: 1px solid #f0dfe1; border-radius: 19px; background: #fff; box-shadow: var(--shadow-sm); }
+    .screen-intro { margin-bottom: 15px; }
+    .screen-intro h3 { margin: 3px 0 4px; font-size: 20px; letter-spacing: -.02em; }
+    .screen-intro p { margin: 0; color: #8c7c80; font-size: 12px; }
+    .result-panel { padding: 22px 17px; border-radius: 21px; background: #fff; box-shadow: var(--shadow-sm); text-align: center; }
+    .result-panel .result-icon { margin-bottom: 14px; }
+    .result-panel h3 { margin: 0 0 7px; font-size: 21px; }
+    .result-panel > p { margin: 0 auto 16px; color: #8c7c80; font-size: 13px; }
+    .result-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; text-align: left; }
+    .result-meta div { padding: 11px; border-radius: 12px; background: #fff5f6; }
+    .result-meta span { display: block; color: #a18488; font-size: 10px; }
+    .result-meta strong { display: block; margin-top: 3px; font-size: 12px; }
+    .list-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 13px; }
+    .list-toolbar h3 { margin: 0; font-size: 18px; }
+    .list-count { color: #8c7c80; font-size: 11px; }
+    .application-card { padding: 16px; border: 1px solid #f0dfe1; border-radius: 18px; background: #fff; box-shadow: var(--shadow-sm); }
+    .application-card + .application-card { margin-top: 10px; }
+    .application-card .card-title { margin-bottom: 12px; }
+    .application-card .btn { margin-top: 12px; }
+    .review-banner { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 14px; padding: 14px; border-radius: 15px; color: #7e333a; background: #fff0f1; }
+    .review-banner svg { width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent); }
+    .review-banner strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .review-banner span { font-size: 11px; }
+    .review-section-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 18px 0 9px; }
+    .review-section-title strong { font-size: 14px; }
+    .review-section-title small { color: #a18488; font-size: 11px; }
+    .license-preview { position: relative; min-height: 148px; display: grid; place-items: center; overflow: hidden; border-radius: 14px; background: linear-gradient(145deg, #fff7f7, #f9e4e6); }
+    .license-paper { width: 74%; padding: 17px 13px; border: 1px solid #edc7ca; border-radius: 5px; color: #80555a; background: #fff; box-shadow: 0 7px 15px rgba(139,15,25,.1); transform: rotate(-2deg); }
+    .license-paper strong { display: block; margin-bottom: 10px; color: #8f0009; font-size: 14px; }
+    .license-paper span { display: block; height: 5px; margin-top: 6px; border-radius: 4px; background: #f3dfe1; }
+    .decision-card { padding: 16px; border: 1px solid #f0dfe1; border-radius: 17px; background: #fff; box-shadow: var(--shadow-sm); }
+    .decision-card .decision-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 12px; }
+    .decision-card .decision-row .btn { min-height: 54px; }
+    .trial-hero { padding: 20px; border-radius: 21px; color: #fff; background: linear-gradient(140deg, #870009, #d70110 64%, #ed6a72); box-shadow: 0 16px 30px rgba(159,0,10,.18); }
+    .trial-hero .product-kicker { color: rgba(255,255,255,.65); }
+    .trial-hero h3 { margin: 4px 0 4px; font-size: 22px; }
+    .trial-hero p { margin: 0; color: rgba(255,255,255,.75); font-size: 12px; }
+    .trial-hero .kpi-strip { margin-top: 18px; }
+    .archive-hero { position: relative; overflow: hidden; padding: 20px; border-radius: 21px; color: #fff; background: linear-gradient(140deg, #870009, #d70110 64%, #ed6a72); box-shadow: 0 16px 30px rgba(159,0,10,.18); }
+    .archive-hero .product-kicker { color: rgba(255,255,255,.65); }
+    .archive-hero h3 { margin: 5px 0 4px; font-size: 20px; }
+    .archive-hero p { margin: 0; color: rgba(255,255,255,.75); font-size: 12px; }
+    .archive-hero .summary-grid { position: relative; z-index: 1; margin: 18px 0 0; }
+    .archive-hero .summary-cell { background: rgba(255,255,255,.14); }
+    .archive-hero .summary-cell span { color: rgba(255,255,255,.7); }
+    .archive-hero .summary-cell strong { color: #fff; }
+    .profile-hero { position: relative; overflow: hidden; padding: 20px; border-radius: 21px; color: #fff; background: linear-gradient(140deg, #870009, #d70110 64%, #ed6a72); box-shadow: 0 16px 30px rgba(159,0,10,.18); }
+    .profile-hero::after { content: ""; position: absolute; right: -42px; top: -58px; width: 170px; height: 170px; border: 25px solid rgba(255,255,255,.12); border-radius: 50%; }
+    .profile-hero-top { position: relative; z-index: 1; display: flex; align-items: center; gap: 13px; }
+    .profile-avatar { width: 54px; height: 54px; display: grid; place-items: center; flex: 0 0 auto; border: 3px solid rgba(255,255,255,.68); border-radius: 50%; color: #a5000b; background: #fff; font-size: 21px; font-weight: 800; box-shadow: 0 8px 16px rgba(76,0,5,.18); }
+    .profile-hero h3 { margin: 0 0 4px; font-size: 21px; }
+    .profile-hero p { margin: 0; color: rgba(255,255,255,.76); font-size: 12px; }
+    .profile-hero .status { margin-left: auto; color: #a5000b; background: #fff; }
+    .profile-summary { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+    .profile-summary-item { padding: 11px; border: 1px solid rgba(255,255,255,.2); border-radius: 13px; background: rgba(255,255,255,.12); }
+    .profile-summary-item span { display: block; color: rgba(255,255,255,.68); font-size: 10px; }
+    .profile-summary-item strong { display: block; margin-top: 3px; color: #fff; font-size: 14px; }
+    .profile-section-title { display: flex; align-items: center; justify-content: space-between; margin: 20px 2px 9px; }
+    .profile-section-title h3 { margin: 0; font-size: 15px; }
+    .profile-section-title small { color: #a18488; font-size: 11px; }
+    .profile-list { overflow: hidden; border: 1px solid #f0dfe1; border-radius: 17px; background: #fff; box-shadow: var(--shadow-sm); }
+    .profile-row { width: 100%; min-height: 64px; display: flex; align-items: center; gap: 11px; padding: 11px 14px; border: 0; border-bottom: 1px solid #f5e8e9; color: var(--ink); background: #fff; text-align: left; }
+    .profile-row:last-child { border-bottom: 0; }
+    .profile-row .quick-icon { width: 34px; height: 34px; flex: 0 0 auto; }
+    .profile-row-copy { min-width: 0; flex: 1; }
+    .profile-row-copy strong { display: block; font-size: 13px; }
+    .profile-row-copy small { display: block; margin-top: 3px; overflow: hidden; color: #8c7c80; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .profile-row > svg { width: 17px; height: 17px; color: #b8898e; }
+    .profile-row.link { cursor: pointer; }
+    .profile-row.link:hover { background: #fff7f8; }
+    .profile-note { margin-top: 13px; }
+    .archive-section { margin-top: 14px; padding: 16px; border: 1px solid #f0dfe1; border-radius: 17px; background: #fff; box-shadow: var(--shadow-sm); }
+    .archive-section h3 { margin: 0 0 12px; font-size: 14px; }
+    .search-panel { padding: 18px; border: 1px solid #f0dfe1; border-radius: 19px; background: #fff; box-shadow: var(--shadow-sm); }
+    .search-panel .field:last-child { margin-bottom: 0; }
+    .candidate-card { width: 100%; display: flex; align-items: flex-start; gap: 11px; margin-bottom: 10px; padding: 15px; border: 1px solid #f0dfe1; border-radius: 17px; color: var(--ink); background: #fff; text-align: left; box-shadow: var(--shadow-sm); cursor: pointer; }
+    .candidate-card.active { border-color: #e87b85; background: #fff3f4; box-shadow: 0 7px 17px rgba(215,1,16,.1); }
+    .candidate-card .radio-dot { margin-top: 2px; }
+    .candidate-card strong { display: block; font-size: 14px; }
+    .candidate-card small { display: block; margin-top: 4px; color: #8c7c80; font-size: 11px; }
+    .candidate-card small + small { margin-top: 2px; }
+    .form-section { padding: 17px; border: 1px solid #f0dfe1; border-radius: 18px; background: #fff; box-shadow: var(--shadow-sm); }
+    .form-section + .form-section { margin-top: 11px; }
+    .form-section-title { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+    .form-section-title .quick-icon { width: 30px; height: 30px; }
+    .form-section-title h3 { margin: 0; font-size: 14px; }
+    .form-section-title small { display: block; margin-top: 2px; color: #a18488; font-size: 10px; }
+    .manager-card { display: flex; align-items: center; gap: 11px; padding: 13px; border: 1px solid #f0dfe1; border-radius: 14px; background: #fff7f7; }
+    .manager-card .avatar { width: 36px; height: 36px; border: 0; color: #fff; background: #d70110; font-size: 13px; }
+    .manager-card strong { display: block; font-size: 13px; }
+    .manager-card small { display: block; margin-top: 3px; color: #8c7c80; font-size: 11px; }
+    .reject-panel { padding: 16px; border: 1px solid #f0c5c9; border-radius: 17px; background: #fff7f7; }
+    .reject-panel strong { display: block; margin-bottom: 5px; color: #a5000b; font-size: 14px; }
+    .reject-panel p { margin: 0; color: #80555a; font-size: 12px; line-height: 1.6; }
+    .terminal-panel { padding: 21px 17px; border-radius: 21px; background: #fff; box-shadow: var(--shadow-sm); text-align: center; }
+    .terminal-panel .result-icon { margin-bottom: 13px; background: linear-gradient(135deg, #9b6b1c, #e0ad58); }
+    .terminal-panel h3 { margin: 0 0 7px; font-size: 20px; }
+    .terminal-panel > p { margin: 0 auto 17px; color: #8c7c80; font-size: 13px; }
+    .media-wall { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
+    .media-tile { min-height: 82px; display: grid; place-items: end start; padding: 10px; border-radius: 13px; color: #fff; background: linear-gradient(145deg, #d97b80, #8f0009); font-size: 11px; font-weight: 700; }
+    .media-tile:nth-child(2) { background: linear-gradient(145deg, #e7b4b7, #b53c46); }
+    .media-tile:nth-child(3) { background: linear-gradient(145deg, #c58c66, #763021); }
+
+    @media (min-width: 721px) and (max-width: 1100px) {
+      .workspace { grid-template-columns: 270px minmax(430px, 1fr); }
+      .stage { padding-inline: 16px; }
+      .phone-wrap { width: min(430px, 100%); }
+    }
+    @media (max-width: 720px) {
+      body { background: var(--paper); }
+      .mobile-header { min-height: 56px; }
+      .stage { padding-top: 56px; }
+      .phone { border: 0; }
+      .content { padding-inline: 16px; }
+      .hero { border-radius: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="workspace">
+    <aside class="rail left" id="flowRail" aria-label="原型流程导航">
+      <p class="eyebrow brand-mark"><img src="assets/jzzc-logo.png" alt="酒店拓展品牌 Logo"><span>JZZC HOTEL</span></p>
+      <h1>酒店拓展 UE</h1>
+      <p class="intro">高保真移动 H5 原型 · 客户经理发展线下酒店，并与酒店销售经理协同完成入驻、审核、试用和转正。</p>
+      <div class="role-switch" role="tablist" aria-label="角色切换">
+        <button type="button" id="managerRole" class="active" role="tab" aria-selected="true">联通客户经理</button>
+        <button type="button" id="hotelRole" role="tab" aria-selected="false">酒店销售经理</button>
+      </div>
+      <p class="section-label">页面流程 · 点击跳转</p>
+      <nav class="flow-list" id="flowList"></nav>
+    </aside>
+
+    <button class="drawer-backdrop" id="drawerBackdrop" aria-label="关闭流程导航"></button>
+
+    <header class="mobile-header">
+      <button class="icon-btn" id="openFlow" aria-label="打开流程导航">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <span class="mobile-brand"><img src="assets/jzzc-logo.png" alt="酒店拓展品牌 Logo"><strong id="mobileCaption">酒店拓展 UE</strong></span>
+      <button class="icon-btn" id="mobileRole" aria-label="切换角色">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/></svg>
+      </button>
+    </header>
+
+    <main class="stage">
+      <div class="phone-wrap">
+        <div class="screen-caption">
+          <span><strong id="screenName">M01 拓展工作台</strong> · 375 × 812</span>
+          <span id="roleCaption">联通客户经理端</span>
+        </div>
+        <section class="phone" aria-live="polite">
+          <div id="screenRoot"></div>
+        </section>
+      </div>
+    </main>
+
+    <aside class="rail right" aria-label="页面设计说明">
+      <div class="annotation-title">
+        <span class="annotation-no" id="annotationNo">M01</span>
+        <h2 id="annotationTitle">拓展工作台</h2>
+      </div>
+      <div id="annotations"></div>
+      <div class="branch" id="branchInfo"></div>
+    </aside>
+  </div>
+
+  <script>
+    const icons = {
+      back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>',
+      home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
+      list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+      user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+      upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5M4 15v5h16v-5"/></svg>',
+      search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
+      building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v16M2 21h20M8 7h2M13 7h2M8 11h2M13 11h2M8 15h2M13 15h2"/></svg>',
+      arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h13m-5-5 5 5-5 5"/></svg>',
+      bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>',
+      trend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 16 5-5 4 3 7-8M15 6h5v5"/></svg>',
+      shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>'
+    };
+
+    const managerFlow = [
+      { id: 'M01', name: '拓展工作台', note: ['聚合待处理、试用到期和近期申请。', '主操作固定为“发展新酒店”。'], branch: '主线入口 → 信用代码预查；也可从申请列表进入历史状态。' },
+      { id: 'M02', name: '入驻预查', note: ['支持信用代码或营业执照识别。', '先预查再录入，避免重复拓展。'], branch: '未入驻 → M04；已入驻 → M03 终止。' },
+      { id: 'M03', name: '已入驻结果', note: ['明确提示不可重复发展。', '保留联系运营入口，不提供继续提交。'], branch: '流程结束分支：酒店已被其他人员入驻，本次申请结束。' },
+      { id: 'M04', name: '录入酒店资料', note: ['以下内容会作为本次申请资料保存，避免后续酒店资料变化影响审核。', '销售经理手机号作为酒店方登录账号，客户经理信息由当前账号自动带入。'], branch: '提交后系统创建酒店销售经理账号并发送邀请。' },
+      { id: 'M05', name: '邀请确认', note: ['提交前再次核对酒店与联系人。', '清晰说明系统后续动作。'], branch: '确认 → M06；返回可修改资料。' },
+      { id: 'M06', name: '邀请已发送', note: ['展示结果和下一步责任人。', '允许返回工作台或查看申请。'], branch: '酒店销售经理收到短信 → 酒店端 H01。' },
+      { id: 'M07', name: '合作申请列表', note: ['多种合作状态转成可读筛选项，状态不只依赖颜色。', '列表优先展示酒店、联系人、编码和下一处理时间。'], branch: '待审核 → M08；试用期 → M09；正式合作/负责人变更 → M11。' },
+      { id: 'M08', name: '合作申请审核', note: ['将申请资料、酒店档案、执照和位置分组核验。', '审核动作写入审核历史，拒绝必须填写原因并通知酒店。'], branch: '通过 → 生成试用合作编码并进入试用期；拒绝可重提或结束流程。' },
+      { id: 'M09', name: '试用期与转正', note: ['直接展示试用合作编码、试用起止时间和合作联系人。', '转正或终止均写入审核历史。'], branch: '继续合作 → M12 正式合作；不续约 → M13 合作终止。' },
+      { id: 'M10', name: '酒店完整档案', note: ['将酒店基础信息、位置、图片、政策、房型和产品价格按业务主题分组。', '低频字段折叠展示，避免移动端信息过载。'], branch: '从审核或合作详情进入，只读核验后返回原流程。' },
+      { id: 'M11', name: '合作关系与负责人变更', note: ['展示当前负责人、历史负责人和上一段合作来源。', '负责人离职后的变更是独立操作，保留原记录以便追溯。'], branch: '发起负责人变更 → 新建待审核关系；原关系审核通过后标记为已变更。' },
+      { id: 'M12', name: '正式合作结果', note: ['明确展示正式酒店编码和生效时间。', '转正结果写入审核历史并可回到合作申请列表。'], branch: '正式合作 → M07 合作申请列表；可继续查看酒店档案。' },
+      { id: 'M13', name: '合作终止结果', note: ['明确展示不续约和终止原因。', '终止结果写入审核历史，流程结束。'], branch: '合作终止 → M07 合作申请列表。' },
+      { id: 'M14', name: '我的', note: ['展示客户经理身份、联系方式和当前负责范围。', '提供常用入口，避免把个人信息混入合作流程。'], branch: '查看合作申请 → M07；查看酒店档案 → M10。' }
+    ];
+
+    const hotelFlow = [
+      { id: 'H01', name: '邀请登录', note: ['短信深链进入，手机号预填。', '首次登录强调来源客户经理。'], branch: '验证成功 → H02 酒店搜索。' },
+      { id: 'H02', name: '搜索酒店', note: ['酒店名与城市均为必填。', '避免同名酒店误选。'], branch: '搜索到 → H03；未搜索到 → H04。' },
+      { id: 'H03', name: '确认已有酒店', note: ['展示关键地址和品牌信息。', '确认前必须上传营业执照，用于核对酒店信息。'], branch: '确认酒店并上传执照 → H05；不是此酒店 → H04 新增。' },
+      { id: 'H04', name: '新增/完善酒店', note: ['酒店资料按基础信息、联系方式、设施服务分组。', '新增和拒绝重提共用资料页，营业执照仍为必传。'], branch: '保存草稿 → 可退出；下一步 → H05 重新选择客户经理并提交。' },
+      { id: 'H05', name: '确认并选经理', note: ['默认展示邀请发起人。', '允许搜索其他客户经理。'], branch: '提交申请后短信通知所选客户经理。' },
+      { id: 'H06', name: '提交成功', note: ['提供预计处理时长。', '状态入口明确可达。'], branch: '客户经理审核 → 通过进入试用 / 拒绝进入 H08。' },
+      { id: 'H07', name: '合作状态', note: ['合作状态、编码和关键时间统一在一张状态卡呈现。', '审核历史展示操作人、时间与原因。'], branch: '试用到期由客户经理决定转正或终止；正式合作后可查看酒店档案。' },
+      { id: 'H08', name: '拒绝与重提', note: ['区分可重提与已入驻后的结束状态。', '明确拒绝通知已发送，并定位需要修正的资料分组。'], branch: '可重提 → H04 编辑后回到 H05；已入驻 → H10 流程结束。' },
+      { id: 'H09', name: '我的酒店档案', note: ['酒店基础信息、位置、图片、政策、房型和产品价格以可读摘要展示。', '展示更新时间，帮助酒店方判断资料是否需要维护。'], branch: '资料变更后重新提交审核，生成新的审核历史。' },
+      { id: 'H10', name: '已被他人入驻', note: ['明确告知酒店已被其他人员入驻。', '流程结束后不提供重新提交入口，避免重复申请。'], branch: '流程结束 → 返回申请结果或结束流程。' },
+      { id: 'H11', name: '我的', note: ['展示酒店销售经理和当前合作酒店。', '保留申请进度、酒店资料和账号设置入口。'], branch: '查看合作状态 → H07；查看酒店档案 → H09。' }
+    ];
+
+    let role = 'manager';
+    let screenId = 'M01';
+
+    function topbar(title, backId = '') {
+      return `<header class="topbar">
+        ${backId ? `<button class="icon-btn" data-go="${backId}" aria-label="返回">${icons.back}</button>` : '<span class="topbar-spacer"></span>'}
+        <h2>${title}</h2><span class="topbar-spacer"></span>
+      </header>`;
+    }
+
+    function bottomNav(active) {
+      return `<nav class="bottom-nav" aria-label="底部导航">
+        <button class="nav-item ${active === 'home' ? 'active' : ''}" data-go="${role === 'manager' ? 'M01' : 'H07'}">${icons.home}<span>首页</span></button>
+        <button class="nav-item ${active === 'list' ? 'active' : ''}" data-go="${role === 'manager' ? 'M07' : 'H07'}">${icons.list}<span>申请</span></button>
+        <button class="nav-item ${active === 'profile' ? 'active' : ''}" data-go="${role === 'manager' ? 'M14' : 'H11'}">${icons.user}<span>我的</span></button>
+      </nav>`;
+    }
+
+    function actions(primaryLabel, primaryGo, secondaryLabel = '', secondaryGo = '') {
+      return `<footer class="bottom-actions ${secondaryLabel ? '' : 'single'}">
+        ${secondaryLabel ? `<button class="btn" data-go="${secondaryGo}">${secondaryLabel}</button>` : ''}
+        <button class="btn primary" data-go="${primaryGo}">${primaryLabel}</button>
+      </footer>`;
+    }
+
+    const screens = {
+      M01: () => `${topbar('酒店拓展')}<div class="content product-home">
+        <section class="product-hero">
+          <div class="product-hero-top"><div><p class="product-kicker">JZZC HOTEL · 今日工作</p><h3>上午好，陈经理</h3><p>聚焦待审核与临期酒店，推进本周合作目标。</p></div><div class="avatar">陈</div></div>
+          <div class="kpi-strip"><div class="kpi"><strong>2</strong><span>待审核</span></div><div class="kpi"><strong>4</strong><span>试用中</span></div><div class="kpi"><strong>1</strong><span>即将到期</span></div></div>
+        </section>
+        <div class="section-title-row"><div><p class="section-kicker">快捷入口</p><h3>开始一项工作</h3></div></div>
+        <div class="quick-grid">
+          <button class="quick-card" data-go="M02"><span class="quick-icon">${icons.building}</span><strong>发展新酒店</strong><small>录入酒店信息并发送邀请</small></button>
+          <button class="quick-card" data-go="M07"><span class="quick-icon">${icons.list}</span><strong>查看合作申请</strong><small>跟进审核与试用状态</small></button>
+        </div>
+        <div class="section-title-row"><div><p class="section-kicker">今日待办</p><h3>优先处理</h3></div><button class="text-action" data-go="M07">查看全部</button></div>
+        <div class="task-stack">
+          <button class="task-card" data-go="M08"><span class="task-icon">${icons.shield}</span><span class="task-body"><span class="task-line"><strong>云栖精选酒店</strong><span class="status pending">待审核</span></span><span class="task-meta">王女士提交 · 13:42 · 需核验执照</span></span><span class="task-arrow">${icons.arrow}</span></button>
+          <button class="task-card" data-go="M09"><span class="task-icon warm">${icons.trend}</span><span class="task-body"><span class="task-line"><strong>悦澜商务酒店</strong><span class="status info">7 天后到期</span></span><span class="task-meta">试用期 · 试用合作编码 M-483210</span></span><span class="task-arrow">${icons.arrow}</span></button>
+        </div>
+        <div class="section-title-row"><div><p class="section-kicker">本周目标</p><h3>拓展进度</h3></div><span class="section-label" style="margin:0">更新于今天 09:15</span></div>
+        <div class="progress-card"><div class="progress-card-head"><span>已完成酒店拓展</span><strong>6 / 10</strong></div><div class="progress-track"><span></span></div><div class="task-meta">还差 4 家达成本周目标</div></div>
+      </div>${bottomNav('home')}`,
+
+      M02: () => `${topbar('入驻预查', 'M01')}<div class="content">
+        <section class="flow-hero"><p class="product-kicker">STEP 1 / 3 · HOTEL ONBOARDING</p><h3>先查酒店，再开始合作</h3><p>输入企业信息，系统会先判断酒店是否已入驻。</p><div class="flow-progress"><span></span></div></section>
+        <div class="verify-card">
+          <div class="verify-heading"><span class="verify-heading-icon">${icons.shield}</span><div><h3>企业信息核验</h3><p>优先使用统一社会信用代码，识别结果更准确</p></div></div>
+          <div class="field"><label for="credit">统一社会信用代码 <span class="required">*</span></label><input id="credit" value="91330106MA27W8E2X6" autocomplete="off"><p class="hint">18 位统一社会信用代码</p></div>
+          <div class="verify-or"><span>或使用营业执照</span></div>
+          <button class="upload compact" type="button">${icons.upload}<span><strong>拍照 / 从相册选择</strong><small>支持 JPG、PNG，图片需完整清晰</small></span></button>
+          <div class="guide-card">${icons.shield}<span>系统会同时核对酒店名称、统一社会信用代码和现有合作关系，避免重复拓展。</span></div>
+        </div>
+        <button class="text-action" data-go="M03">查看“已入驻”分支示例</button>
+      </div>${actions('查询入驻状态', 'M04')}`,
+
+      M03: () => `${topbar('查询结果', 'M02')}<div class="content"><div class="result-panel">
+        <div class="result-icon">!</div><p class="product-kicker" style="color:#a45a60">DUPLICATE HOTEL CHECK</p><h3>该酒店已入驻</h3><p>杭州云庭国际酒店已与平台建立合作，无法重复发起拓展申请。</p>
+        <div class="result-meta"><div><span>酒店编码</span><strong>HTL-HZ-008316</strong></div><div><span>合作状态</span><strong>正式合作</strong></div><div><span>当前负责人</span><strong>李经理</strong></div><div><span>查询时间</span><strong>今天 14:08</strong></div></div>
+        <div class="notice danger" style="text-align:left"><strong>流程已终止</strong><br>如需了解合作归属，请联系平台运营。</div>
+        <button class="btn full">联系平台运营</button>
+      </div></div>${actions('返回工作台', 'M01')}`,
+
+      M04: () => `${topbar('录入酒店资料', 'M02')}<div class="content">
+        <section class="flow-hero"><p class="product-kicker">STEP 2 / 3 · HOTEL PROFILE</p><h3>补全酒店合作资料</h3><p>以下内容会作为本次申请资料保存，供客户经理审核。</p><div class="flow-progress"><span style="width:66%"></span></div></section>
+        <div class="notice info"><strong>本次申请资料</strong><br>酒店资料后续修改不会覆盖本次审核依据，提交前请确认酒店信息和联系人准确。</div>
+        <div class="card">
+          <div class="card-title"><h3>酒店基础信息</h3><span class="status info">已预查</span></div>
+          <div class="field"><label for="creditSnapshot">统一社会信用代码</label><input id="creditSnapshot" value="91330106MA27W8E2X6" readonly><p class="hint">来自入驻预查，不可修改</p></div>
+          <div class="field"><label for="hotelName">酒店名称 <span class="required">*</span></label><input id="hotelName" value="杭州云栖精选酒店"></div>
+          <div class="field-grid"><div class="field"><label for="city">城市 <span class="required">*</span></label><select id="city"><option>杭州市</option></select></div><div class="field"><label for="district">区县</label><select id="district"><option>西湖区</option></select></div></div>
+          <div class="field"><label for="address">详细地址 <span class="required">*</span></label><textarea id="address">西湖区文三路 188 号</textarea></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h3>酒店销售经理</h3><small>用于登录和接收通知</small></div>
+          <div class="field"><label for="contactName">酒店销售经理姓名 <span class="required">*</span></label><input id="contactName" value="王女士"></div>
+          <div class="field"><label for="contactPhone">销售经理手机号 <span class="required">*</span></label><input id="contactPhone" type="tel" value="138 0000 8621"><p class="hint">该手机号将用于酒店销售经理登录</p></div>
+        </div>
+        <div class="card"><div class="card-title"><h3>负责客户经理</h3><small>当前账号</small></div><div class="info-row"><span>姓名</span><strong>陈晨</strong></div><div class="info-row"><span>手机号</span><strong>138****1234</strong></div></div>
+      </div>${actions('下一步', 'M05')}`,
+
+      M05: () => `${topbar('确认邀请', 'M04')}<div class="content">
+        <section class="flow-hero"><p class="product-kicker">STEP 3 / 3 · SEND INVITATION</p><h3>确认后发送合作邀请</h3><p>系统会创建酒店销售经理账号并发送短信链接。</p><div class="flow-progress"><span style="width:100%"></span></div></section>
+        <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.building}</span><div><h3>酒店信息</h3><small>本次申请资料</small></div></div>
+          <div class="check-row"><span>信用代码</span><strong>9133…E2X6</strong></div><div class="check-row"><span>酒店名称</span><strong>杭州云栖精选酒店</strong></div><div class="check-row"><span>城市</span><strong>杭州市 · 西湖区</strong></div><div class="check-row"><span>地址</span><strong>文三路 188 号</strong></div>
+        </div>
+        <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.user}</span><div><h3>合作双方</h3><small>邀请关系确认</small></div></div><div class="manager-card"><span class="avatar">王</span><span><strong>王女士 · 酒店销售经理</strong><small>138****8621 · 将接收短信邀请</small></span></div><div class="manager-card" style="margin-top:8px"><span class="avatar">陈</span><span><strong>陈晨 · 联通客户经理</strong><small>138****1234 · 当前登录账号</small></span></div></div>
+      </div>${actions('确认并发送邀请', 'M06', '返回修改', 'M04')}`,
+
+      M06: () => `${topbar('邀请结果')}<div class="content"><div class="result-panel">
+        <div class="result-icon">✓</div><p class="product-kicker" style="color:#a45a60">INVITATION SENT</p><h3>邀请已发送</h3><p>短信已发送至酒店销售经理，等待对方完成酒店确认、执照上传和合作申请。</p>
+        <div class="result-meta"><div><span>接收人</span><strong>王女士 · 138****8621</strong></div><div><span>发送时间</span><strong>今天 14:12</strong></div><div><span>申请状态</span><strong>等待酒店提交</strong></div><div><span>申请编号</span><strong>AP20260730018</strong></div></div>
+        <div class="notice success" style="text-align:left"><strong>下一步</strong><br>酒店完成资料后，你会在“合作申请”中收到审核提醒。</div>
+        <button class="btn primary full" data-go="M07">查看申请列表</button>
+      </div></div>${actions('返回工作台', 'M01')}`,
+
+      M07: () => `${topbar('合作申请')}<div class="content">
+        <div class="list-toolbar"><div><p class="section-kicker">MY PIPELINE</p><h3>合作申请</h3></div><span class="list-count">共 9 条 · 更新于刚刚</span></div>
+        <div class="chip-row" aria-label="合作状态筛选"><button class="chip active">待处理 3</button><button class="chip">待审核</button><button class="chip">拒绝可重提</button><button class="chip">已被他人入驻</button><button class="chip">试用期</button><button class="chip">正式合作</button><button class="chip">负责人变更</button><button class="chip">已终止</button><button class="chip">已失效</button></div>
+        <div class="section-head"><p class="section-label">优先处理</p><button type="button">按更新时间排序</button></div>
+        <article class="application-card"><div class="card-title"><div><h3>杭州云栖精选酒店</h3><small>申请 AP20260730018 · 13:42</small></div><span class="status pending">待审核</span></div><div class="summary-grid"><div class="summary-cell"><span>酒店销售经理</span><strong>王女士</strong></div><div class="summary-cell"><span>信用代码</span><strong>9133…E2X6</strong></div></div><button class="btn primary full" data-go="M08">开始审核 ${icons.arrow}</button></article>
+        <article class="application-card"><div class="card-title"><div><h3>悦澜商务酒店</h3><small>酒店编码 HTL-HZ-004821</small></div><span class="status info">试用期</span></div><div class="summary-grid"><div class="summary-cell"><span>试用合作编码</span><strong>M-483210</strong></div><div class="summary-cell"><span>试用截止</span><strong>7 天后</strong></div></div><button class="btn full" data-go="M09">处理转正 ${icons.arrow}</button></article>
+        <article class="application-card"><div class="card-title"><div><h3>南山智选酒店</h3><small>原经理账号已停用</small></div><span class="status danger">待更换负责人</span></div><div class="info-row"><span>原客户经理</span><strong>周敏 · 已离职</strong></div><button class="btn full" data-go="M11">处理负责人变更 ${icons.arrow}</button></article>
+      </div>${bottomNav('list')}`,
+
+      M08: () => `${topbar('合作申请审核', 'M07')}<div class="content">
+        <div class="review-banner">${icons.shield}<span><strong>请完成四项核验</strong>酒店基础信息、执照、联系人和位置均需与申请资料一致。</span></div>
+        <div class="review-section-title"><strong>申请概览</strong><small>AP20260730018 · 待审核</small></div>
+        <div class="form-section"><div class="summary-grid"><div class="summary-cell"><span>提交时间</span><strong>07-30 14:08</strong></div><div class="summary-cell"><span>负责经理</span><strong>陈晨</strong></div></div><div class="info-row"><span>酒店编码</span><strong>HTL-HZ-008316</strong></div><div class="info-row"><span>本次合作记录</span><strong>BIND-20260730018</strong></div><div class="info-row"><span>历史合作记录</span><strong>无 · 首次合作</strong></div><div class="info-row"><span>统一社会信用代码</span><strong>91330106MA27W8E2X6</strong></div></div>
+        <div class="review-section-title"><strong>营业执照核验</strong><button class="status info">查看大图</button></div>
+        <div class="license-preview"><div class="license-paper"><strong>营业执照</strong><span></span><span style="width:76%"></span><span style="width:55%"></span></div></div>
+        <div class="review-section-title"><strong>本次申请资料</strong><small>提交时保存</small></div>
+        <div class="form-section"><div class="info-row"><span>酒店名称</span><strong>杭州云栖精选酒店</strong></div><div class="info-row"><span>酒店销售经理</span><strong>王女士 · 138****8621</strong></div><div class="info-row"><span>所在城市</span><strong>杭州市 · 西湖区</strong></div><div class="info-row"><span>详细地址</span><strong>文三路 188 号</strong></div></div>
+        <button class="btn full" data-go="M10">查看酒店完整档案</button>
+        <div class="review-section-title"><strong>审核历史</strong><small>自动留痕</small></div>
+        <div class="timeline-card"><div class="timeline"><div class="timeline-item current"><strong>等待客户经理审核</strong><div class="audit-meta"><span>2026-07-30 14:08</span><span>操作人：系统</span></div></div><div class="timeline-item done"><strong>酒店提交合作申请</strong><div class="audit-meta"><span>2026-07-30 14:08</span><span>王女士</span></div></div></div></div>
+        <div class="decision-card"><div class="card-title"><h3>审核决定</h3><small>拒绝时必须填写原因</small></div><div class="field"><label for="auditNote">审核意见</label><textarea id="auditNote" placeholder="请填写审核意见"></textarea></div><div class="decision-row"><button class="btn danger" data-go="H08">拒绝申请</button><button class="btn primary" data-go="M09">审核通过</button></div></div>
+      </div>${actions('暂不处理', 'M07')}`,
+
+      M09: () => `${topbar('试用合作', 'M07')}<div class="content">
+        <section class="trial-hero"><p class="product-kicker">TRIAL PARTNERSHIP · HTL-HZ-004821</p><h3>悦澜商务酒店</h3><p>试用期即将结束，请在到期前确认合作去向。</p><div class="kpi-strip"><div class="kpi"><strong>7</strong><span>剩余天数</span></div><div class="kpi"><strong>92</strong><span>累计订单</span></div><div class="kpi"><strong>4.8</strong><span>服务评分</span></div></div></section>
+        <div class="card"><div class="card-title"><h3>合作编码与周期</h3><small>酒店 HTL-HZ-004821</small></div><div class="info-row"><span>试用合作编码</span><strong>M-483210</strong></div><div class="info-row"><span>试用开始</span><strong>2026-05-06 10:18</strong></div><div class="info-row"><span>试用结束</span><strong>2026-08-06 23:59</strong></div><div class="info-row"><span>正式酒店编码</span><strong>转正后生成</strong></div></div>
+        <div class="notice success"><strong>审核已通过，已进入试用期</strong><br>试用期结束后，由联通客户经理选择继续合作或结束合作。</div>
+        <div class="card"><div class="card-title"><h3>当前合作关系</h3><button class="status info" data-go="M11">查看记录</button></div><div class="info-row"><span>联通客户经理</span><strong>陈晨 · 138****1234</strong></div><div class="info-row"><span>酒店销售经理</span><strong>赵先生 · 139****4206</strong></div></div>
+        <div class="card"><div class="card-title"><h3>最近审核历史</h3></div><div class="timeline"><div class="timeline-item done"><strong>审核通过，进入试用</strong><div class="audit-meta"><span>2026-05-06 10:18</span><span>陈晨</span></div></div><div class="timeline-item"><strong>合作申请已提交</strong><div class="audit-meta"><span>2026-05-06 09:42</span><span>赵先生</span></div></div></div></div>
+        <button class="btn full" data-go="M10">查看酒店档案</button>
+        <div class="notice">试用到期后必须选择是否继续合作。继续合作将生成正式酒店编码。</div>
+        <button class="btn danger full" data-go="M13">不续约并下架</button>
+      </div>${actions('继续合作并转正', 'M12', '稍后决定', 'M07')}`,
+
+      M12: () => `${topbar('正式合作结果', 'M09')}<div class="content"><div class="result-panel">
+        <div class="result-icon">✓</div><p class="product-kicker" style="color:#a45a60">FORMAL PARTNERSHIP</p><h3>已转为正式合作</h3><p>酒店继续合作，系统已生成正式酒店编码。</p>
+        <div class="result-meta"><div><span>正式酒店编码</span><strong>F-HZ-004821</strong></div><div><span>生效时间</span><strong>2026-08-06 23:59</strong></div><div><span>审核历史</span><strong>AUDIT-20260806018</strong></div><div><span>合作状态</span><strong>正式合作</strong></div></div>
+        <div class="notice success" style="text-align:left">转正结果已写入合作记录，酒店销售经理可继续查看酒店档案。</div>
+      </div></div>${actions('返回合作列表', 'M07', '查看酒店档案', 'M10')}`,
+
+      M13: () => `${topbar('合作终止结果', 'M09')}<div class="content"><div class="terminal-panel">
+        <div class="result-icon">!</div><p class="product-kicker" style="color:#9a6812">PARTNERSHIP ENDED</p><h3>酒店已下架</h3><p>试用期结束后未继续合作，酒店已停止展示和接单。</p>
+        <div class="result-meta"><div><span>终止原因</span><strong>客户经理选择不续约</strong></div><div><span>终止时间</span><strong>2026-08-06 23:59</strong></div><div><span>审核编号</span><strong>AUDIT-20260806019</strong></div><div><span>当前状态</span><strong>已终止</strong></div></div>
+        <div class="notice danger" style="text-align:left">下架结果已写入合作记录，如需重新合作，需要重新发起酒店拓展。</div>
+      </div></div>${actions('返回合作列表', 'M07')}`,
+
+      M14: () => `${topbar('我的', 'M01')}<div class="content">
+        <section class="profile-hero"><div class="profile-hero-top"><span class="profile-avatar">陈</span><div><p class="product-kicker">MY WORKSPACE</p><h3>陈晨</h3><p>联通客户经理 · 杭州区域</p></div><span class="status success">已认证</span></div><div class="profile-summary"><div class="profile-summary-item"><span>待处理申请</span><strong>3 条</strong></div><div class="profile-summary-item"><span>本周已拓展</span><strong>6 家</strong></div></div></section>
+        <div class="profile-section-title"><h3>账号信息</h3><small>当前登录账号</small></div>
+        <div class="profile-list"><div class="profile-row"><span class="quick-icon">${icons.user}</span><span class="profile-row-copy"><strong>姓名</strong><small>陈晨</small></span></div><div class="profile-row"><span class="quick-icon">${icons.bell}</span><span class="profile-row-copy"><strong>手机号</strong><small>138****1234 · 已验证</small></span></div><div class="profile-row"><span class="quick-icon">${icons.building}</span><span class="profile-row-copy"><strong>负责区域</strong><small>杭州 · 宁波 · 嘉兴</small></span></div></div>
+        <div class="profile-section-title"><h3>常用入口</h3><small>快速处理工作</small></div>
+        <div class="profile-list"><button class="profile-row link" data-go="M07"><span class="quick-icon">${icons.list}</span><span class="profile-row-copy"><strong>合作申请</strong><small>查看待审核、试用期和负责人变更</small></span>${icons.arrow}</button><button class="profile-row link" data-go="M10"><span class="quick-icon">${icons.building}</span><span class="profile-row-copy"><strong>酒店档案</strong><small>查看已合作酒店的完整资料</small></span>${icons.arrow}</button></div>
+        <div class="notice profile-note">账号信息由平台统一维护。如需修改，请联系平台运营。</div>
+      </div>${bottomNav('profile')}`,
+
+      M10: () => `${topbar('酒店完整档案', 'M08')}<div class="content">
+        <section class="archive-hero"><p class="product-kicker">HOTEL ARCHIVE · READ ONLY</p><h3>杭州云栖精选酒店</h3><p>HTL-HZ-008316 · 最近更新 2026-07-30 13:56</p><div class="summary-grid"><div class="summary-cell"><span>住宿类型</span><strong>酒店 · 舒适型</strong></div><div class="summary-cell"><span>星级 / 评分</span><strong>三星 · 4.7</strong></div><div class="summary-cell"><span>集团 / 品牌</span><strong>云栖 · 云栖精选</strong></div><div class="summary-cell"><span>客房总数</span><strong>128 间</strong></div></div></section>
+        <section class="archive-section"><h3>酒店档案状态</h3><div class="info-row"><span>酒店状态</span><strong>可用</strong></div><div class="info-row"><span>联系电话</span><strong>0571-8899 6622</strong></div><div class="info-row"><span>酒店邮箱</span><strong>service@yqhotel.cn</strong></div><div class="info-row"><span>适用客群</span><strong>中国大陆及港澳台宾客</strong></div><div class="info-row"><span>简短描述</span><strong>西湖区商务及休闲型酒店</strong></div></section>
+        <details class="detail-group" open><summary>地理位置</summary><div class="detail-body"><div class="info-row"><span>行政区</span><strong>浙江省 · 杭州市 · 西湖区</strong></div><div class="info-row"><span>商圈</span><strong>黄龙商圈</strong></div><div class="info-row"><span>地址</span><strong>文三路 188 号</strong></div><div class="info-row"><span>坐标</span><strong>120.128521, 30.279612</strong></div><div class="info-row"><span>交通距离</span><strong>地铁 0.4km · 火车站 6.8km</strong></div></div></details>
+        <details class="detail-group"><summary>位置扩展字段 · 交通参考</summary><div class="detail-body"><div class="info-row"><span>国家 / 邮编</span><strong>中国 · 310012</strong></div><div class="info-row"><span>地标 / 路口</span><strong>黄龙体育中心 · 文三路口</strong></div><div class="info-row"><span>机场 / 市中心</span><strong>机场 31.5km · 市中心 4.2km</strong></div></div></details>
+        <details class="detail-group" open><summary>设施与接待政策</summary><div class="detail-body"><div class="summary-grid" style="margin-top:12px"><div class="summary-cell"><span>早餐</span><strong>提供</strong></div><div class="summary-cell"><span>停车</span><strong>免费停车</strong></div><div class="summary-cell"><span>充电车位</span><strong>8 个</strong></div><div class="summary-cell"><span>行李寄存</span><strong>支持</strong></div><div class="summary-cell"><span>宠物</span><strong>不可携带</strong></div><div class="summary-cell"><span>未成年人</span><strong>可接待</strong></div></div><div class="info-row"><span>适用客群</span><strong>中国大陆及港澳台宾客</strong></div></div></details>
+        <details class="detail-group"><summary>设施明细 · 12 项</summary><div class="detail-body"><div class="info-row"><span>设施分类</span><strong>客房 / 公共区域 / 服务</strong></div><div class="info-row"><span>启用状态</span><strong>10 项启用 · 2 项停用</strong></div><div class="info-row"><span>补充说明</span><strong>设施状态和说明已同步</strong></div></div></details>
+        <details class="detail-group"><summary>酒店图片 · 12 张</summary><div class="detail-body"><div class="media-grid" style="margin-top:12px"><div class="media-placeholder">主图<br>外观</div><div class="media-placeholder">大堂</div><div class="media-placeholder">高级大床房</div></div><div class="info-row"><span>图片来源</span><strong>酒店上传</strong></div><div class="info-row"><span>最近更新</span><strong>2026-07-30 13:56</strong></div></div></details>
+        <details class="detail-group"><summary>图片资料 · 12 张</summary><div class="detail-body"><div class="info-row"><span>主图 / 类型</span><strong>是 · 外观主图</strong></div><div class="info-row"><span>排序 / 缩略图</span><strong>第 1 位 · 已生成</strong></div><div class="info-row"><span>图片来源</span><strong>酒店上传</strong></div></div></details>
+        <details class="detail-group"><summary>酒店政策 · 4 项</summary><div class="detail-body"><div class="info-row"><span>入住与退房</span><strong>14:00 后 / 12:00 前</strong></div><div class="info-row"><span>取消政策</span><strong>入住日前 18:00 前免费取消</strong></div><div class="info-row"><span>早餐政策</span><strong>68 元/人，1.2m 以下儿童免费</strong></div><div class="info-row"><span>内容格式</span><strong>文字与规则说明</strong></div></div></details>
+        <details class="detail-group"><summary>房型信息 · 6 个</summary><div class="detail-body"><div class="info-row"><span>示例房型</span><strong>高级大床房 · 32㎡</strong></div><div class="info-row"><span>入住能力</span><strong>最多 2 人 · 1 张大床</strong></div><div class="info-row"><span>房型设施</span><strong>Wi-Fi · 独立卫浴 · 可加床</strong></div><div class="info-row"><span>房型状态</span><strong>可售</strong></div></div></details>
+        <details class="detail-group"><summary>销售产品与价格 · 8 个</summary><div class="detail-body"><div class="info-row"><span>产品示例</span><strong>高级大床房｜含早</strong></div><div class="info-row"><span>预付 / 取消</span><strong>到店付 · 入住日前 18:00 可取消</strong></div><div class="info-row"><span>价格</span><strong>¥428 / 晚 · CNY</strong></div><div class="info-row"><span>数据状态</span><strong>在售 · 最近同步 07-30 13:56</strong></div></div></details>
+        <div class="notice">酒店档案更新时间：2026-07-30 13:56。审核时以本次申请资料与营业执照为准。</div>
+      </div>`,
+
+      M11: () => `${topbar('合作关系与负责人变更', 'M07')}<div class="content">
+        <div class="review-banner">${icons.shield}<span><strong>合作关系可追溯</strong>酒店合作关系会保留历史记录，负责人变更不会覆盖原客户经理信息。</span></div>
+        <section class="archive-section"><div class="card-title"><div><h3>南山智选酒店</h3><small>HTL-SZ-003906</small></div><span class="status success">正式合作</span></div><div class="summary-grid"><div class="summary-cell"><span>当前合作记录</span><strong>BIND-20251218006</strong></div><div class="summary-cell"><span>上一次合作记录</span><strong>BIND-20250918002</strong></div></div><div class="info-row"><span>正式酒店编码</span><strong>F-SZ-390618</strong></div><div class="info-row"><span>正式合作时间</span><strong>2025-12-18 15:30</strong></div></section>
+        <div class="review-section-title"><strong>负责人变更历史</strong><small>3 条记录</small></div>
+        <div class="timeline-card"><div class="timeline">
+          <div class="timeline-item current"><strong>等待更换客户经理</strong><div class="audit-meta"><span>原经理账号已停用</span><span>2026-07-29</span></div></div>
+          <div class="timeline-item done"><strong>正式合作 · 周敏</strong><div class="audit-meta"><span>合作记录 BIND-20251218006</span><span>2025-12-18</span></div></div>
+          <div class="timeline-item"><strong>试用期合作开始</strong><div class="audit-meta"><span>试用合作编码 M-SZ-390612</span><span>2025-09-18</span></div></div>
+        </div></div>
+        <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.user}</span><div><h3>指定新负责人</h3><small>承接当前正式合作关系</small></div></div><div class="field"><label for="newManager">新客户经理 <span class="required">*</span></label><select id="newManager"><option>请选择客户经理</option><option>陈晨 · 138****1234</option></select></div><div class="field"><label for="rebindReason">变更说明 <span class="required">*</span></label><textarea id="rebindReason">原客户经理离职，转交区域负责人继续维护。</textarea></div></div>
+        <div class="notice danger">提交并审核通过后，原负责人关系会标记为“已变更”，新负责人承接正式合作关系。</div>
+      </div>${actions('提交负责人变更', 'M07', '取消', 'M07')}`,
+
+      H01: () => `${topbar('酒店合作邀请')}<div class="content hotel-invite">
+        <div class="invite-mark"><img src="assets/jzzc-logo.png" alt="酒店合作平台 Logo"></div>
+        <div class="invite-copy"><p class="product-kicker" style="color:#a45a60">JZZC HOTEL · HOTEL ONBOARDING</p><h3>欢迎加入酒店合作平台</h3><p>完善酒店资料，提交合作申请，开启线上合作。</p></div>
+        <div class="invite-from"><span class="avatar">陈</span><span><strong>陈晨 邀请你加入合作</strong><small>联通客户经理 · 138****1234</small></span></div>
+        <div class="verify-card"><div class="verify-heading"><span class="verify-heading-icon">${icons.bell}</span><div><h3>短信验证登录</h3><p>手机号已由邀请链接预填，请完成验证</p></div></div><div class="field"><label for="loginPhone">手机号</label><input id="loginPhone" type="tel" value="138 0000 8621" readonly></div><div class="field"><label for="sms">短信验证码 <span class="required">*</span></label><div class="code-field"><input id="sms" inputmode="numeric" placeholder="请输入 6 位验证码"><button class="text-action" type="button">获取验证码</button></div></div></div>
+        <div class="notice">登录即表示你已阅读并同意平台服务协议与隐私政策。</div>
+      </div>${actions('验证并继续', 'H02')}`,
+
+      H02: () => `${topbar('查找我的酒店')}<div class="content">
+        <section class="flow-hero"><p class="product-kicker">STEP 1 / 3 · FIND YOUR HOTEL</p><h3>先找到正确的酒店</h3><p>通过酒店名称和城市筛选，避免选择同名酒店。</p><div class="flow-progress"><span></span></div></section>
+        <div class="search-panel"><div class="verify-heading"><span class="verify-heading-icon">${icons.search}</span><div><h3>搜索酒店</h3><p>输入酒店信息进行匹配</p></div></div><div class="field"><label for="searchHotel">酒店名称 <span class="required">*</span></label><input id="searchHotel" value="杭州云栖精选酒店"></div><div class="field"><label for="searchCity">所在城市 <span class="required">*</span></label><select id="searchCity"><option>杭州市</option></select></div></div>
+        <button class="text-action" data-go="H04">没有找到？直接新增我的酒店</button>
+      </div>${actions('搜索酒店', 'H03')}`,
+
+      H03: () => `${topbar('选择酒店', 'H02')}<div class="content">
+        <div class="list-toolbar"><div><p class="section-kicker">SEARCH RESULT</p><h3>找到 2 家可能匹配</h3></div><span class="list-count">杭州市</span></div>
+        <button class="candidate-card active"><span class="radio-dot"></span><span><strong>杭州云栖精选酒店</strong><small>云栖精选 · 舒适型 / 三星 · 评分 4.7</small><small>西湖区文三路 188 号 · 距地铁 0.4km</small></span></button>
+        <button class="candidate-card"><span class="radio-dot"></span><span><strong>云栖精选酒店（滨江店）</strong><small>云栖精选 · 高档型 / 四星 · 评分 4.8</small><small>滨江区江南大道 66 号 · 距地铁 0.7km</small></span></button>
+        <div class="form-section"><div class="card-title"><h3>营业执照</h3><span class="status pending">确认前必传</span></div><button class="upload compact" type="button">${icons.upload}<span><strong>上传营业执照</strong><small>用于核对酒店名称和统一社会信用代码</small></span></button></div>
+        <button class="text-action" data-go="H04">都不是，新增我的酒店</button>
+      </div>${actions('确认是这家酒店', 'H05', '重新搜索', 'H02')}`,
+
+      H04: () => `${topbar('新增/完善酒店', 'H02')}<div class="content">
+        <section class="flow-hero"><p class="product-kicker">STEP 2 / 3 · COMPLETE PROFILE</p><h3>完善酒店资料</h3><p>核心信息提交后将进入客户经理审核。</p><div class="flow-progress"><span style="width:66%"></span></div></section>
+        <div class="notice info"><strong>资料填写提示</strong><br>带有红色星号的字段为必填，营业执照必须清晰可见。</div>
+        <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.building}</span><div><h3>基础信息</h3><small>酒店基础资料</small></div></div><div class="field"><label for="newName">酒店名称 <span class="required">*</span></label><input id="newName" value="杭州云栖精选酒店"></div><div class="field"><label for="newNameEn">英文名称</label><input id="newNameEn" value="Hangzhou Yunqi Select Hotel"></div><div class="field-grid"><div class="field"><label for="category">住宿类型</label><select id="category"><option>酒店</option></select></div><div class="field"><label for="star">酒店星级</label><select id="star"><option>三星 / 舒适型</option></select></div><div class="field"><label for="group">酒店集团</label><input id="group" value="云栖酒店集团"></div><div class="field"><label for="brand">酒店品牌</label><input id="brand" value="云栖精选"></div><div class="field"><label for="rooms">客房总数</label><input id="rooms" inputmode="numeric" value="128"></div><div class="field"><label for="openDate">开业年份</label><input id="openDate" inputmode="numeric" value="2019"></div></div></div>
+        <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.search}</span><div><h3>位置与联系</h3><small>酒店位置与对客联系方式</small></div></div><div class="field-grid"><div class="field"><label for="province">省份</label><select id="province"><option>浙江省</option></select></div><div class="field"><label for="newCity">城市 <span class="required">*</span></label><select id="newCity"><option>杭州市</option></select></div><div class="field"><label for="newDistrict">区县</label><select id="newDistrict"><option>西湖区</option></select></div><div class="field"><label for="zone">商圈</label><select id="zone"><option>黄龙商圈</option></select></div><div class="field wide"><label for="newAddress">详细地址 <span class="required">*</span></label><textarea id="newAddress">文三路 188 号</textarea></div><div class="field"><label for="hotelPhone">酒店电话</label><input id="hotelPhone" type="tel" value="0571-88996622"></div><div class="field"><label for="receptionPhone">前台电话</label><input id="receptionPhone" type="tel" value="0571-88996623"></div><div class="field wide"><label for="hotelEmail">酒店邮箱</label><input id="hotelEmail" type="email" value="service@yqhotel.cn"></div></div></div>
+        <details class="detail-group"><summary>设施与接待政策 · 可选补充</summary><div class="detail-body"><div class="field-grid" style="margin-top:12px"><div class="field"><label for="breakfast">早餐</label><select id="breakfast"><option>提供</option></select></div><div class="field"><label for="parking">停车场</label><select id="parking"><option>有</option></select></div><div class="field"><label for="charging">充电车位</label><select id="charging"><option>有</option></select></div><div class="field"><label for="luggage">行李寄存</label><select id="luggage"><option>支持</option></select></div><div class="field"><label for="pets">宠物</label><select id="pets"><option>不允许</option></select></div><div class="field"><label for="child">未成年人</label><select id="child"><option>允许接待</option></select></div></div></div></details>
+        <details class="detail-group"><summary>酒店图片与政策 · 后续可补</summary><div class="detail-body"><div class="media-grid" style="margin-top:12px"><button class="media-placeholder" type="button">＋ 主图</button><button class="media-placeholder" type="button">＋ 大堂</button><button class="media-placeholder" type="button">＋ 房型</button></div><div class="notice" style="margin-top:12px">正式合作前建议至少上传酒店主图、大堂和主要房型图片，并完善入住、取消和早餐政策。</div></div></details>
+        <div class="card"><div class="field"><label>营业执照 <span class="required">*</span></label><button class="upload" type="button">${icons.upload}<span><strong>上传营业执照</strong><small>确保名称、信用代码清晰可见</small></span></button></div></div>
+      </div>${actions('下一步', 'H05')}`,
+
+      H05: () => `${topbar('确认合作申请', 'H04')}<div class="content">
+        <section class="flow-hero"><p class="product-kicker">STEP 3 / 3 · SUBMIT APPLICATION</p><h3>确认后提交合作申请</h3><p>资料提交后，客户经理会收到短信提醒并开始审核。</p><div class="flow-progress"><span style="width:100%"></span></div></section>
+        <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.building}</span><div><h3>酒店基础信息</h3><small>已上传营业执照</small></div><span class="status success">已完成</span></div><div class="info-row"><span>酒店名称</span><strong>杭州云栖精选酒店</strong></div><div class="info-row"><span>信用代码</span><strong>9133…E2X6</strong></div><div class="info-row"><span>类型与规模</span><strong>舒适型 · 128 间</strong></div><div class="info-row"><span>所在位置</span><strong>杭州西湖区 · 黄龙商圈</strong></div><div class="info-row"><span>联系方式</span><strong>0571-88996622</strong></div></div>
+        <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.user}</span><div><h3>选择负责客户经理</h3><small>提交后将通知所选经理</small></div></div>
+        <button class="radio-card active"><span class="radio-dot"></span><span><strong>陈晨 · 客户经理</strong><small>本次邀请发起人 · 138****1234</small></span></button>
+        <button class="radio-card"><span class="radio-dot"></span><span><strong>选择其他客户经理</strong><small>按姓名或手机号搜索</small></span></button>
+        </div>
+        <div class="notice">提交后将短信通知客户经理，预计 1–2 个工作日完成审核。</div>
+      </div>${actions('确认提交申请', 'H06', '返回修改', 'H04')}`,
+
+      H06: () => `${topbar('提交结果')}<div class="content"><div class="result-panel">
+        <div class="result-icon">✓</div><p class="product-kicker" style="color:#a45a60">APPLICATION SUBMITTED</p><h3>合作申请已提交</h3><p>客户经理陈晨已收到审核提醒。审核结果会通过短信通知你。</p>
+        <div class="result-meta"><div><span>申请编号</span><strong>AP20260730018</strong></div><div><span>提交时间</span><strong>2026-07-30 14:08</strong></div><div><span>当前状态</span><strong>等待审核</strong></div><div><span>预计处理</span><strong>1–2 个工作日</strong></div></div>
+        <button class="btn primary full" data-go="H07">查看申请进度</button>
+      </div></div>${actions('完成', 'H07')}`,
+
+      H07: () => `${topbar('申请详情')}<div class="content">
+        <section class="status-hero"><div class="card-title"><div><p class="product-kicker">COOPERATION STATUS</p><h3>杭州云栖精选酒店</h3><small>酒店编码 HTL-HZ-008316</small></div><span class="status info">试用期</span></div><div class="summary-grid"><div class="summary-cell"><span>试用合作编码</span><strong>M-483210</strong></div><div class="summary-cell"><span>正式酒店编码</span><strong>待生成</strong></div><div class="summary-cell"><span>试用剩余</span><strong>92 天</strong></div><div class="summary-cell"><span>试用结束</span><strong>2026-10-30</strong></div></div></section>
+        <div class="card"><div class="info-row"><span>负责客户经理</span><strong>陈晨 · 138****1234</strong></div><div class="info-row"><span>酒店销售经理</span><strong>王女士 · 138****8621</strong></div></div>
+        <div class="timeline-card"><div class="card-title"><h3>审核与合作记录</h3><small>完整留痕</small></div><div class="timeline">
+          <div class="timeline-item current"><strong>进入三个月试用期</strong><div class="audit-meta"><span>2026-07-30 16:20</span><span>试用合作编码 M-483210</span></div></div>
+          <div class="timeline-item done"><strong>客户经理审核通过</strong><div class="audit-meta"><span>2026-07-30 16:18</span><span>操作人：陈晨</span></div></div>
+          <div class="timeline-item"><strong>合作申请已提交</strong><div class="audit-meta"><span>2026-07-30 14:08</span><span>操作人：王女士</span></div></div>
+        </div></div></div>
+        <button class="btn full" data-go="H09">查看我的酒店档案</button>
+        <button class="btn danger full" data-go="H08">演示：查看拒绝状态</button>
+      </div>${bottomNav('list')}`,
+
+      H08: () => `${topbar('审核未通过', 'H07')}<div class="content">
+        <div class="reject-panel"><strong>需要修改后重新提交</strong><p>营业执照中的企业名称与填写的酒店名称不一致，请按证照内容完整填写。</p></div>
+        <div class="notice success"><strong>结果通知已发送</strong><br>短信已发送至酒店销售经理 138****8621。</div>
+        <div class="form-section"><div class="card-title"><h3>审核结果</h3><span class="status danger">拒绝 · 可重提</span></div><div class="info-row"><span>审核人</span><strong>陈晨 · 138****1234</strong></div><div class="info-row"><span>审核时间</span><strong>2026-07-30 16:18</strong></div><div class="info-row"><span>审核编号</span><strong>AUDIT-20260730026</strong></div></div>
+        <div class="review-section-title"><strong>需要修正的资料</strong><small>1 项</small></div>
+        <div class="form-section"><div class="card-title"><h3>酒店名称</h3><span class="status danger">不一致</span></div><p class="intro" style="margin:0">请按照营业执照上的企业名称完整填写。</p><button class="btn full" data-go="H04">去修改这一项 ${icons.arrow}</button></div>
+        <button class="text-action" data-go="H10">查看“已被他人入驻”结束状态</button>
+      </div>${actions('修改资料并重提', 'H04', '返回申请', 'H07')}`,
+
+      H09: () => `${topbar('我的酒店档案', 'H07')}<div class="content">
+        <section class="archive-hero"><p class="product-kicker">MY HOTEL · ARCHIVE</p><h3>杭州云栖精选酒店</h3><p>HTL-HZ-008316 · 资料可用</p><div class="summary-grid"><div class="summary-cell"><span>住宿类型</span><strong>酒店 · 舒适型</strong></div><div class="summary-cell"><span>星级 / 评分</span><strong>三星 · 4.7</strong></div><div class="summary-cell"><span>客房总数</span><strong>128 间</strong></div><div class="summary-cell"><span>最近更新</span><strong>07-30 13:56</strong></div></div></section>
+        <section class="archive-section"><h3>酒店档案状态</h3><div class="info-row"><span>酒店状态</span><strong>可用 · 可继续合作</strong></div><div class="info-row"><span>适用客群</span><strong>中国大陆及港澳台宾客</strong></div><div class="info-row"><span>酒店简介</span><strong>西湖区商务及休闲型酒店</strong></div></section>
+        <details class="detail-group" open><summary>基础信息与联系方式</summary><div class="detail-body"><div class="info-row"><span>英文名称</span><strong>Hangzhou Yunqi Select Hotel</strong></div><div class="info-row"><span>集团 / 品牌</span><strong>云栖酒店集团 / 云栖精选</strong></div><div class="info-row"><span>酒店电话</span><strong>0571-8899 6622</strong></div><div class="info-row"><span>前台电话</span><strong>0571-8899 6623</strong></div><div class="info-row"><span>邮箱</span><strong>service@yqhotel.cn</strong></div></div></details>
+        <details class="detail-group" open><summary>位置与交通</summary><div class="detail-body"><div class="info-row"><span>行政区 / 商圈</span><strong>杭州西湖区 · 黄龙商圈</strong></div><div class="info-row"><span>详细地址</span><strong>文三路 188 号</strong></div><div class="info-row"><span>附近交通</span><strong>地铁 0.4km · 火车站 6.8km</strong></div></div></details>
+        <details class="detail-group"><summary>酒店图片 · 12 张</summary><div class="detail-body"><div class="media-wall" style="margin-top:12px"><div class="media-tile">主图 · 外观</div><div class="media-tile">大堂</div><div class="media-tile">高级大床房</div></div></div></details>
+        <details class="detail-group"><summary>位置扩展字段 · 交通参考</summary><div class="detail-body"><div class="info-row"><span>国家 / 邮编</span><strong>中国 · 310012</strong></div><div class="info-row"><span>地标 / 路口</span><strong>黄龙体育中心 · 文三路口</strong></div><div class="info-row"><span>机场 / 市中心</span><strong>机场 31.5km · 市中心 4.2km</strong></div></div></details>
+        <details class="detail-group"><summary>设施与政策 · 10 项</summary><div class="detail-body"><div class="info-row"><span>设施摘要</span><strong>早餐 · 停车 · 充电 · 寄存</strong></div><div class="info-row"><span>设施状态</span><strong>10 项启用 · 2 项停用</strong></div><div class="info-row"><span>入住政策</span><strong>14:00 后入住，12:00 前退房</strong></div><div class="info-row"><span>取消政策</span><strong>入住日前 18:00 前免费取消</strong></div></div></details>
+        <details class="detail-group"><summary>房型与销售产品</summary><div class="detail-body"><div class="info-row"><span>房型</span><strong>高级大床房 · 32㎡ · 最多 2 人</strong></div><div class="info-row"><span>产品</span><strong>含早 · 到店付 · 可取消</strong></div><div class="info-row"><span>价格</span><strong>¥428 / 晚 · CNY</strong></div></div></details>
+        <div class="notice">修改酒店名称、地址或营业执照等关键资料后，需要重新提交客户经理审核。</div>
+      </div>${actions('编辑酒店资料', 'H04', '返回合作状态', 'H07')}`,
+
+      H10: () => `${topbar('已被他人入驻', 'H08')}<div class="content"><div class="terminal-panel">
+        <div class="result-icon">!</div><p class="product-kicker" style="color:#9a6812">APPLICATION CLOSED</p><h3>酒店已被其他人入驻</h3><p>该酒店已与平台建立合作，当前申请无法继续提交。</p>
+        <div class="result-meta"><div><span>处理结果</span><strong>申请终止</strong></div><div><span>通知状态</span><strong>已通知</strong></div><div><span>审核编号</span><strong>AUDIT-20260806020</strong></div><div><span>当前状态</span><strong>已入驻，流程结束</strong></div></div>
+        <div class="notice danger" style="text-align:left">如需了解合作归属，请联系平台运营。当前页面不提供重新提交入口。</div>
+      </div></div>${actions('返回申请详情', 'H07')}`,
+
+      H11: () => `${topbar('我的', 'H07')}<div class="content">
+        <section class="profile-hero"><div class="profile-hero-top"><span class="profile-avatar">王</span><div><p class="product-kicker">MY ACCOUNT</p><h3>王女士</h3><p>酒店销售经理 · 杭州云栖精选酒店</p></div><span class="status success">已验证</span></div><div class="profile-summary"><div class="profile-summary-item"><span>当前合作酒店</span><strong>1 家</strong></div><div class="profile-summary-item"><span>资料状态</span><strong>可继续合作</strong></div></div></section>
+        <div class="profile-section-title"><h3>账号信息</h3><small>当前登录账号</small></div>
+        <div class="profile-list"><div class="profile-row"><span class="quick-icon">${icons.user}</span><span class="profile-row-copy"><strong>联系人</strong><small>王女士</small></span></div><div class="profile-row"><span class="quick-icon">${icons.bell}</span><span class="profile-row-copy"><strong>手机号</strong><small>138****8621 · 已验证</small></span></div><div class="profile-row"><span class="quick-icon">${icons.building}</span><span class="profile-row-copy"><strong>当前酒店</strong><small>杭州云栖精选酒店 · HTL-HZ-008316</small></span></div></div>
+        <div class="profile-section-title"><h3>常用入口</h3><small>快速查看合作信息</small></div>
+        <div class="profile-list"><button class="profile-row link" data-go="H07"><span class="quick-icon">${icons.list}</span><span class="profile-row-copy"><strong>合作进度</strong><small>查看审核结果、试用期和合作状态</small></span>${icons.arrow}</button><button class="profile-row link" data-go="H09"><span class="quick-icon">${icons.building}</span><span class="profile-row-copy"><strong>我的酒店资料</strong><small>查看酒店基础信息、图片和政策</small></span>${icons.arrow}</button></div>
+        <div class="notice profile-note">修改酒店名称、地址或营业执照等关键资料后，需要重新提交客户经理审核。</div>
+      </div>${bottomNav('profile')}`
+    };
+
+    function currentFlow() { return role === 'manager' ? managerFlow : hotelFlow; }
+
+    function renderFlow() {
+      const flow = currentFlow();
+      document.getElementById('flowList').innerHTML = flow.map(item => `
+        <button class="flow-item ${item.id === screenId ? 'active' : ''}" data-go="${item.id}" ${item.id === screenId ? 'aria-current="page"' : ''}>
+          <span class="flow-no">${item.id.replace(/[A-Z]/, '')}</span><span>${item.name}</span>
+        </button>`).join('');
+      document.getElementById('managerRole').classList.toggle('active', role === 'manager');
+      document.getElementById('hotelRole').classList.toggle('active', role === 'hotel');
+      document.getElementById('managerRole').setAttribute('aria-selected', String(role === 'manager'));
+      document.getElementById('hotelRole').setAttribute('aria-selected', String(role === 'hotel'));
+    }
+
+    function render() {
+      const flow = currentFlow();
+      const meta = flow.find(item => item.id === screenId) || flow[0];
+      document.getElementById('screenRoot').innerHTML = screens[screenId]();
+      document.getElementById('screenRoot').innerHTML = document.getElementById('screenRoot').innerHTML
+        .replaceAll('酒店联系人', '酒店销售经理')
+        .replaceAll('负责客户经理', '联通客户经理');
+      document.getElementById('screenName').textContent = `${meta.id} ${meta.name}`;
+      document.getElementById('roleCaption').textContent = role === 'manager' ? '联通客户经理端' : '酒店销售经理端';
+      document.getElementById('mobileCaption').textContent = `${meta.id} ${meta.name}`;
+      document.getElementById('annotationNo').textContent = meta.id;
+      document.getElementById('annotationTitle').textContent = meta.name;
+      document.getElementById('annotations').innerHTML = meta.note.map((text, index) => `<div class="annotation"><strong>${index + 1}. 设计要点</strong><p>${text}</p></div>`).join('');
+      document.getElementById('branchInfo').innerHTML = `<strong>流程去向</strong>${meta.branch}`;
+      renderFlow();
+      bindNavigation();
+      document.querySelector('.content')?.scrollTo(0, 0);
+    }
+
+    function go(id) {
+      if (!screens[id]) return;
+      role = id.startsWith('M') ? 'manager' : 'hotel';
+      screenId = id;
+      render();
+      closeDrawer();
+    }
+
+    function bindNavigation() {
+      document.querySelectorAll('[data-go]').forEach(button => {
+        button.addEventListener('click', () => go(button.dataset.go));
+      });
+    }
+
+    function setRole(nextRole) {
+      role = nextRole;
+      screenId = nextRole === 'manager' ? 'M01' : 'H01';
+      render();
+    }
+
+    function closeDrawer() {
+      document.getElementById('flowRail').classList.remove('open');
+      document.getElementById('drawerBackdrop').classList.remove('open');
+    }
+
+    document.getElementById('managerRole').addEventListener('click', () => setRole('manager'));
+    document.getElementById('hotelRole').addEventListener('click', () => setRole('hotel'));
+    document.getElementById('mobileRole').addEventListener('click', () => setRole(role === 'manager' ? 'hotel' : 'manager'));
+    document.getElementById('openFlow').addEventListener('click', () => {
+      document.getElementById('flowRail').classList.add('open');
+      document.getElementById('drawerBackdrop').classList.add('open');
+    });
+    document.getElementById('drawerBackdrop').addEventListener('click', closeDrawer);
+    render();
+  </script>
+</body>
+</html>
