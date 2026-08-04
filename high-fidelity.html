@@ -1260,10 +1260,10 @@
     <aside class="rail left" id="flowRail" aria-label="原型流程导航">
       <p class="eyebrow brand-mark"><img src="assets/jzzc-logo.png" alt="酒店拓展品牌 Logo"><span>JZZC HOTEL</span></p>
       <h1>酒店拓展 UE</h1>
-      <p class="intro">高保真移动 H5 原型 · 客户经理发展线下酒店，并与酒店销售经理协同完成入驻、审核、试用和转正。</p>
+      <p class="intro">高保真移动 H5 原型 · 客户经理发展线下酒店，并与酒店合作负责人协同完成入驻、审核、试用和转正。</p>
       <div class="role-switch" role="tablist" aria-label="角色切换">
         <button type="button" id="managerRole" class="active" role="tab" aria-selected="true">联通客户经理</button>
-        <button type="button" id="hotelRole" role="tab" aria-selected="false">酒店销售经理</button>
+        <button type="button" id="hotelRole" role="tab" aria-selected="false">酒店合作负责人</button>
       </div>
       <p class="section-label">页面流程 · 点击跳转</p>
       <nav class="flow-list" id="flowList"></nav>
@@ -1322,9 +1322,9 @@
       { id: 'M01', name: '拓展工作台', note: ['聚合待处理、试用到期和近期申请。', '主操作固定为“发展新酒店”。'], branch: '主线入口 → 信用代码预查；也可从申请列表进入历史状态。' },
       { id: 'M02', name: '入驻预查', note: ['支持信用代码或营业执照识别。', '先预查再录入，避免重复拓展。'], branch: '未入驻 → M04；已入驻 → M03 终止。' },
       { id: 'M03', name: '已入驻结果', note: ['明确提示不可重复发展。', '保留联系运营入口，不提供继续提交。'], branch: '流程结束分支：酒店已被其他人员入驻，本次申请结束。' },
-      { id: 'M04', name: '录入酒店资料', note: ['以下内容会作为本次申请资料保存，避免后续酒店资料变化影响审核。', '销售经理手机号作为酒店方登录账号，客户经理信息由当前账号自动带入。'], branch: '提交后系统创建酒店销售经理账号并发送邀请。' },
+      { id: 'M04', name: '录入酒店资料', note: ['以下内容会作为本次申请资料保存，避免后续酒店资料变化影响审核。', '合作负责人手机号作为酒店方登录账号，客户经理信息由当前账号自动带入。'], branch: '提交后系统创建酒店合作负责人账号并发送邀请。' },
       { id: 'M05', name: '邀请确认', note: ['提交前再次核对酒店与联系人。', '清晰说明系统后续动作。'], branch: '确认 → M06；返回可修改资料。' },
-      { id: 'M06', name: '邀请已发送', note: ['展示结果和下一步责任人。', '允许返回工作台或查看申请。'], branch: '酒店销售经理收到短信 → 酒店端 H01。' },
+      { id: 'M06', name: '邀请已发送', note: ['展示结果和下一步责任人。', '允许返回工作台或查看申请。'], branch: '酒店合作负责人收到短信 → 酒店端 H01。' },
       { id: 'M07', name: '合作申请列表', note: ['多种合作状态转成可读筛选项，状态不只依赖颜色。', '列表优先展示酒店、联系人、编码和下一处理时间。'], branch: '待审核 → M08；试用期 → M09；正式合作/负责人变更 → M11。' },
       { id: 'M08', name: '合作申请审核', note: ['将申请资料、酒店档案、执照和位置分组核验。', '审核动作写入审核历史，拒绝必须填写原因并通知酒店。'], branch: '通过 → 生成试用合作编码并进入试用期；拒绝可重提或结束流程。' },
       { id: 'M09', name: '试用期与转正', note: ['直接展示试用合作编码、试用起止时间和合作联系人。', '转正或终止均写入审核历史。'], branch: '继续合作 → M12 正式合作；不续约 → M13 合作终止。' },
@@ -1346,7 +1346,7 @@
       { id: 'H08', name: '拒绝与重提', note: ['区分可重提与已入驻后的结束状态。', '明确拒绝通知已发送，并定位需要修正的资料分组。'], branch: '可重提 → H04 编辑后回到 H05；已入驻 → H10 流程结束。' },
       { id: 'H09', name: '我的酒店档案', note: ['酒店基础信息、位置、图片、政策、房型和产品价格以可读摘要展示。', '展示更新时间，帮助酒店方判断资料是否需要维护。'], branch: '资料变更后重新提交审核，生成新的审核历史。' },
       { id: 'H10', name: '已被他人入驻', note: ['明确告知酒店已被其他人员入驻。', '流程结束后不提供重新提交入口，避免重复申请。'], branch: '流程结束 → 返回申请结果或结束流程。' },
-      { id: 'H11', name: '我的', note: ['展示酒店销售经理和当前合作酒店。', '保留申请进度、酒店资料和账号设置入口。'], branch: '查看合作状态 → H07；查看酒店档案 → H09。' }
+      { id: 'H11', name: '我的', note: ['展示酒店合作负责人和当前合作酒店。', '保留申请进度、酒店资料和账号设置入口。'], branch: '查看合作状态 → H07；查看酒店档案 → H09。' }
     ];
 
     let role = 'manager';
@@ -1424,23 +1424,23 @@
           <div class="field"><label for="address">详细地址 <span class="required">*</span></label><textarea id="address">西湖区文三路 188 号</textarea></div>
         </div>
         <div class="card">
-          <div class="card-title"><h3>酒店销售经理</h3><small>用于登录和接收通知</small></div>
-          <div class="field"><label for="contactName">酒店销售经理姓名 <span class="required">*</span></label><input id="contactName" value="王女士"></div>
-          <div class="field"><label for="contactPhone">销售经理手机号 <span class="required">*</span></label><input id="contactPhone" type="tel" value="138 0000 8621"><p class="hint">该手机号将用于酒店销售经理登录</p></div>
+          <div class="card-title"><h3>酒店合作负责人</h3><small>用于登录和接收通知</small></div>
+          <div class="field"><label for="contactName">酒店合作负责人姓名 <span class="required">*</span></label><input id="contactName" value="王女士"></div>
+          <div class="field"><label for="contactPhone">合作负责人手机号 <span class="required">*</span></label><input id="contactPhone" type="tel" value="138 0000 8621"><p class="hint">该手机号将用于酒店合作负责人登录</p></div>
         </div>
         <div class="card"><div class="card-title"><h3>负责客户经理</h3><small>当前账号</small></div><div class="info-row"><span>姓名</span><strong>陈晨</strong></div><div class="info-row"><span>手机号</span><strong>138****1234</strong></div></div>
       </div>${actions('下一步', 'M05')}`,
 
       M05: () => `${topbar('确认邀请', 'M04')}<div class="content">
-        <section class="flow-hero"><p class="product-kicker">STEP 3 / 3 · SEND INVITATION</p><h3>确认后发送合作邀请</h3><p>系统会创建酒店销售经理账号并发送短信链接。</p><div class="flow-progress"><span style="width:100%"></span></div></section>
+        <section class="flow-hero"><p class="product-kicker">STEP 3 / 3 · SEND INVITATION</p><h3>确认后发送合作邀请</h3><p>系统会创建酒店合作负责人账号并发送短信链接。</p><div class="flow-progress"><span style="width:100%"></span></div></section>
         <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.building}</span><div><h3>酒店信息</h3><small>本次申请资料</small></div></div>
           <div class="check-row"><span>信用代码</span><strong>9133…E2X6</strong></div><div class="check-row"><span>酒店名称</span><strong>杭州云栖精选酒店</strong></div><div class="check-row"><span>城市</span><strong>杭州市 · 西湖区</strong></div><div class="check-row"><span>地址</span><strong>文三路 188 号</strong></div>
         </div>
-        <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.user}</span><div><h3>合作双方</h3><small>邀请关系确认</small></div></div><div class="manager-card"><span class="avatar">王</span><span><strong>王女士 · 酒店销售经理</strong><small>138****8621 · 将接收短信邀请</small></span></div><div class="manager-card" style="margin-top:8px"><span class="avatar">陈</span><span><strong>陈晨 · 联通客户经理</strong><small>138****1234 · 当前登录账号</small></span></div></div>
+        <div class="form-section"><div class="form-section-title"><span class="quick-icon">${icons.user}</span><div><h3>合作双方</h3><small>邀请关系确认</small></div></div><div class="manager-card"><span class="avatar">王</span><span><strong>王女士 · 酒店合作负责人</strong><small>138****8621 · 将接收短信邀请</small></span></div><div class="manager-card" style="margin-top:8px"><span class="avatar">陈</span><span><strong>陈晨 · 联通客户经理</strong><small>138****1234 · 当前登录账号</small></span></div></div>
       </div>${actions('确认并发送邀请', 'M06', '返回修改', 'M04')}`,
 
       M06: () => `${topbar('邀请结果')}<div class="content"><div class="result-panel">
-        <div class="result-icon">✓</div><p class="product-kicker" style="color:#a45a60">INVITATION SENT</p><h3>邀请已发送</h3><p>短信已发送至酒店销售经理，等待对方完成酒店确认、执照上传和合作申请。</p>
+        <div class="result-icon">✓</div><p class="product-kicker" style="color:#a45a60">INVITATION SENT</p><h3>邀请已发送</h3><p>短信已发送至酒店合作负责人，等待对方完成酒店确认、执照上传和合作申请。</p>
         <div class="result-meta"><div><span>接收人</span><strong>王女士 · 138****8621</strong></div><div><span>发送时间</span><strong>今天 14:12</strong></div><div><span>申请状态</span><strong>等待酒店提交</strong></div><div><span>申请编号</span><strong>AP20260730018</strong></div></div>
         <div class="notice success" style="text-align:left"><strong>下一步</strong><br>酒店完成资料后，你会在“合作申请”中收到审核提醒。</div>
         <button class="btn primary full" data-go="M07">查看申请列表</button>
@@ -1450,7 +1450,7 @@
         <div class="list-toolbar"><div><p class="section-kicker">MY PIPELINE</p><h3>合作申请</h3></div><span class="list-count">共 9 条 · 更新于刚刚</span></div>
         <div class="chip-row" aria-label="合作状态筛选"><button class="chip active">待处理 3</button><button class="chip">待审核</button><button class="chip">拒绝可重提</button><button class="chip">已被他人入驻</button><button class="chip">试用期</button><button class="chip">正式合作</button><button class="chip">负责人变更</button><button class="chip">已终止</button><button class="chip">已失效</button></div>
         <div class="section-head"><p class="section-label">优先处理</p><button type="button">按更新时间排序</button></div>
-        <article class="application-card"><div class="card-title"><div><h3>杭州云栖精选酒店</h3><small>申请 AP20260730018 · 13:42</small></div><span class="status pending">待审核</span></div><div class="summary-grid"><div class="summary-cell"><span>酒店销售经理</span><strong>王女士</strong></div><div class="summary-cell"><span>信用代码</span><strong>9133…E2X6</strong></div></div><button class="btn primary full" data-go="M08">开始审核 ${icons.arrow}</button></article>
+        <article class="application-card"><div class="card-title"><div><h3>杭州云栖精选酒店</h3><small>申请 AP20260730018 · 13:42</small></div><span class="status pending">待审核</span></div><div class="summary-grid"><div class="summary-cell"><span>酒店合作负责人</span><strong>王女士</strong></div><div class="summary-cell"><span>信用代码</span><strong>9133…E2X6</strong></div></div><button class="btn primary full" data-go="M08">开始审核 ${icons.arrow}</button></article>
         <article class="application-card"><div class="card-title"><div><h3>悦澜商务酒店</h3><small>酒店编码 HTL-HZ-004821</small></div><span class="status info">试用期</span></div><div class="summary-grid"><div class="summary-cell"><span>试用合作编码</span><strong>M-483210</strong></div><div class="summary-cell"><span>试用截止</span><strong>7 天后</strong></div></div><button class="btn full" data-go="M09">处理转正 ${icons.arrow}</button></article>
         <article class="application-card"><div class="card-title"><div><h3>南山智选酒店</h3><small>原经理账号已停用</small></div><span class="status danger">待更换负责人</span></div><div class="info-row"><span>原客户经理</span><strong>周敏 · 已离职</strong></div><button class="btn full" data-go="M11">处理负责人变更 ${icons.arrow}</button></article>
       </div>${bottomNav('list')}`,
@@ -1462,7 +1462,7 @@
         <div class="review-section-title"><strong>营业执照核验</strong><button class="status info">查看大图</button></div>
         <div class="license-preview"><div class="license-paper"><strong>营业执照</strong><span></span><span style="width:76%"></span><span style="width:55%"></span></div></div>
         <div class="review-section-title"><strong>本次申请资料</strong><small>提交时保存</small></div>
-        <div class="form-section"><div class="info-row"><span>酒店名称</span><strong>杭州云栖精选酒店</strong></div><div class="info-row"><span>酒店销售经理</span><strong>王女士 · 138****8621</strong></div><div class="info-row"><span>所在城市</span><strong>杭州市 · 西湖区</strong></div><div class="info-row"><span>详细地址</span><strong>文三路 188 号</strong></div></div>
+        <div class="form-section"><div class="info-row"><span>酒店名称</span><strong>杭州云栖精选酒店</strong></div><div class="info-row"><span>酒店合作负责人</span><strong>王女士 · 138****8621</strong></div><div class="info-row"><span>所在城市</span><strong>杭州市 · 西湖区</strong></div><div class="info-row"><span>详细地址</span><strong>文三路 188 号</strong></div></div>
         <button class="btn full" data-go="M10">查看酒店完整档案</button>
         <div class="review-section-title"><strong>审核历史</strong><small>自动留痕</small></div>
         <div class="timeline-card"><div class="timeline"><div class="timeline-item current"><strong>等待客户经理审核</strong><div class="audit-meta"><span>2026-07-30 14:08</span><span>操作人：系统</span></div></div><div class="timeline-item done"><strong>酒店提交合作申请</strong><div class="audit-meta"><span>2026-07-30 14:08</span><span>王女士</span></div></div></div></div>
@@ -1473,7 +1473,7 @@
         <section class="trial-hero"><p class="product-kicker">TRIAL PARTNERSHIP · HTL-HZ-004821</p><h3>悦澜商务酒店</h3><p>试用期即将结束，请在到期前确认合作去向。</p><div class="kpi-strip"><div class="kpi"><strong>7</strong><span>剩余天数</span></div><div class="kpi"><strong>92</strong><span>累计订单</span></div><div class="kpi"><strong>4.8</strong><span>服务评分</span></div></div></section>
         <div class="card"><div class="card-title"><h3>合作编码与周期</h3><small>酒店 HTL-HZ-004821</small></div><div class="info-row"><span>试用合作编码</span><strong>M-483210</strong></div><div class="info-row"><span>试用开始</span><strong>2026-05-06 10:18</strong></div><div class="info-row"><span>试用结束</span><strong>2026-08-06 23:59</strong></div><div class="info-row"><span>正式酒店编码</span><strong>转正后生成</strong></div></div>
         <div class="notice success"><strong>审核已通过，已进入试用期</strong><br>试用期结束后，由联通客户经理选择继续合作或结束合作。</div>
-        <div class="card"><div class="card-title"><h3>当前合作关系</h3><button class="status info" data-go="M11">查看记录</button></div><div class="info-row"><span>联通客户经理</span><strong>陈晨 · 138****1234</strong></div><div class="info-row"><span>酒店销售经理</span><strong>赵先生 · 139****4206</strong></div></div>
+        <div class="card"><div class="card-title"><h3>当前合作关系</h3><button class="status info" data-go="M11">查看记录</button></div><div class="info-row"><span>联通客户经理</span><strong>陈晨 · 138****1234</strong></div><div class="info-row"><span>酒店合作负责人</span><strong>赵先生 · 139****4206</strong></div></div>
         <div class="card"><div class="card-title"><h3>最近审核历史</h3></div><div class="timeline"><div class="timeline-item done"><strong>审核通过，进入试用</strong><div class="audit-meta"><span>2026-05-06 10:18</span><span>陈晨</span></div></div><div class="timeline-item"><strong>合作申请已提交</strong><div class="audit-meta"><span>2026-05-06 09:42</span><span>赵先生</span></div></div></div></div>
         <button class="btn full" data-go="M10">查看酒店档案</button>
         <div class="notice">试用到期后必须选择是否继续合作。继续合作将生成正式酒店编码。</div>
@@ -1483,7 +1483,7 @@
       M12: () => `${topbar('正式合作结果', 'M09')}<div class="content"><div class="result-panel">
         <div class="result-icon">✓</div><p class="product-kicker" style="color:#a45a60">FORMAL PARTNERSHIP</p><h3>已转为正式合作</h3><p>酒店继续合作，系统已生成正式酒店编码。</p>
         <div class="result-meta"><div><span>正式酒店编码</span><strong>F-HZ-004821</strong></div><div><span>生效时间</span><strong>2026-08-06 23:59</strong></div><div><span>审核历史</span><strong>AUDIT-20260806018</strong></div><div><span>合作状态</span><strong>正式合作</strong></div></div>
-        <div class="notice success" style="text-align:left">转正结果已写入合作记录，酒店销售经理可继续查看酒店档案。</div>
+        <div class="notice success" style="text-align:left">转正结果已写入合作记录，酒店合作负责人可继续查看酒店档案。</div>
       </div></div>${actions('返回合作列表', 'M07', '查看酒店档案', 'M10')}`,
 
       M13: () => `${topbar('合作终止结果', 'M09')}<div class="content"><div class="terminal-panel">
@@ -1579,7 +1579,7 @@
 
       H07: () => `${topbar('申请详情')}<div class="content">
         <section class="status-hero"><div class="card-title"><div><p class="product-kicker">COOPERATION STATUS</p><h3>杭州云栖精选酒店</h3><small>酒店编码 HTL-HZ-008316</small></div><span class="status info">试用期</span></div><div class="summary-grid"><div class="summary-cell"><span>试用合作编码</span><strong>M-483210</strong></div><div class="summary-cell"><span>正式酒店编码</span><strong>待生成</strong></div><div class="summary-cell"><span>试用剩余</span><strong>92 天</strong></div><div class="summary-cell"><span>试用结束</span><strong>2026-10-30</strong></div></div></section>
-        <div class="card"><div class="info-row"><span>负责客户经理</span><strong>陈晨 · 138****1234</strong></div><div class="info-row"><span>酒店销售经理</span><strong>王女士 · 138****8621</strong></div></div>
+        <div class="card"><div class="info-row"><span>负责客户经理</span><strong>陈晨 · 138****1234</strong></div><div class="info-row"><span>酒店合作负责人</span><strong>王女士 · 138****8621</strong></div></div>
         <div class="timeline-card"><div class="card-title"><h3>审核与合作记录</h3><small>完整留痕</small></div><div class="timeline">
           <div class="timeline-item current"><strong>进入三个月试用期</strong><div class="audit-meta"><span>2026-07-30 16:20</span><span>试用合作编码 M-483210</span></div></div>
           <div class="timeline-item done"><strong>客户经理审核通过</strong><div class="audit-meta"><span>2026-07-30 16:18</span><span>操作人：陈晨</span></div></div>
@@ -1590,7 +1590,7 @@
 
       H08: () => `${topbar('审核未通过', 'H07')}<div class="content">
         <div class="reject-panel"><strong>需要修改后重新提交</strong><p>营业执照中的企业名称与填写的酒店名称不一致，请按证照内容完整填写。</p></div>
-        <div class="notice success"><strong>结果通知已发送</strong><br>短信已发送至酒店销售经理 138****8621。</div>
+        <div class="notice success"><strong>结果通知已发送</strong><br>短信已发送至酒店合作负责人 138****8621。</div>
         <div class="form-section"><div class="card-title"><h3>审核结果</h3><span class="status danger">拒绝 · 可重提</span></div><div class="info-row"><span>审核人</span><strong>陈晨 · 138****1234</strong></div><div class="info-row"><span>审核时间</span><strong>2026-07-30 16:18</strong></div><div class="info-row"><span>审核编号</span><strong>AUDIT-20260730026</strong></div></div>
         <div class="review-section-title"><strong>需要修正的资料</strong><small>1 项</small></div>
         <div class="form-section"><div class="card-title"><h3>酒店名称</h3><span class="status danger">不一致</span></div><p class="intro" style="margin:0">请按照营业执照上的企业名称完整填写。</p><button class="btn full" data-go="H04">去修改这一项 ${icons.arrow}</button></div>
@@ -1616,7 +1616,7 @@
       </div></div>${actions('返回申请详情', 'H07')}`,
 
       H11: () => `${topbar('我的', 'H07')}<div class="content">
-        <section class="profile-hero"><div class="profile-hero-top"><span class="profile-avatar">王</span><div><p class="product-kicker">MY ACCOUNT</p><h3>王女士</h3><p>酒店销售经理 · 杭州云栖精选酒店</p></div><span class="status success">已验证</span></div><div class="profile-summary"><div class="profile-summary-item"><span>当前合作酒店</span><strong>1 家</strong></div><div class="profile-summary-item"><span>资料状态</span><strong>可继续合作</strong></div></div></section>
+        <section class="profile-hero"><div class="profile-hero-top"><span class="profile-avatar">王</span><div><p class="product-kicker">MY ACCOUNT</p><h3>王女士</h3><p>酒店合作负责人 · 杭州云栖精选酒店</p></div><span class="status success">已验证</span></div><div class="profile-summary"><div class="profile-summary-item"><span>当前合作酒店</span><strong>1 家</strong></div><div class="profile-summary-item"><span>资料状态</span><strong>可继续合作</strong></div></div></section>
         <div class="profile-section-title"><h3>账号信息</h3><small>当前登录账号</small></div>
         <div class="profile-list"><div class="profile-row"><span class="quick-icon">${icons.user}</span><span class="profile-row-copy"><strong>联系人</strong><small>王女士</small></span></div><div class="profile-row"><span class="quick-icon">${icons.bell}</span><span class="profile-row-copy"><strong>手机号</strong><small>138****8621 · 已验证</small></span></div><div class="profile-row"><span class="quick-icon">${icons.building}</span><span class="profile-row-copy"><strong>当前酒店</strong><small>杭州云栖精选酒店 · HTL-HZ-008316</small></span></div></div>
         <div class="profile-section-title"><h3>常用入口</h3><small>快速查看合作信息</small></div>
@@ -1644,10 +1644,10 @@
       const meta = flow.find(item => item.id === screenId) || flow[0];
       document.getElementById('screenRoot').innerHTML = screens[screenId]();
       document.getElementById('screenRoot').innerHTML = document.getElementById('screenRoot').innerHTML
-        .replaceAll('酒店联系人', '酒店销售经理')
+        .replaceAll('酒店联系人', '酒店合作负责人')
         .replaceAll('负责客户经理', '联通客户经理');
       document.getElementById('screenName').textContent = `${meta.id} ${meta.name}`;
-      document.getElementById('roleCaption').textContent = role === 'manager' ? '联通客户经理端' : '酒店销售经理端';
+      document.getElementById('roleCaption').textContent = role === 'manager' ? '联通客户经理端' : '酒店合作负责人端';
       document.getElementById('mobileCaption').textContent = `${meta.id} ${meta.name}`;
       document.getElementById('annotationNo').textContent = meta.id;
       document.getElementById('annotationTitle').textContent = meta.name;
